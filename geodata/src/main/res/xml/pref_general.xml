@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+                  android:key="geodata_preferences">
+
+    <Preference
+        android:key="language"
+        android:summary="@string/pref_language_summary"
+        android:title="@string/pref_language_title" />
+    <!-- Preference
+        android:key="user_profile"
+        android:summary="@string/pref_profile_summary"
+        android:title="@string/pref_profile_title" / -->
+    <com.mjhram.geodata.views.component.CustomSwitchPreference
+        android:title="@string/notifications_pref_title"
+        android:summary="@string/notifications_pref_summary"
+        android:key="notification_pref"
+        android:defaultValue="true"
+        />
+    <!-- com.mjhram.geodata.views.component.CustomSwitchPreference
+        android:title="@string/startonbootup_title"
+        android:summary="@string/startonbootup_summary"
+        android:key="startonbootup"/>
+
+    <Preference android:key="about_version_info"></Preference -->
+
+
+
+</PreferenceScreen>

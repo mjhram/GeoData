@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.mjhram.geodata"
+    android:installLocation="auto">
+
+    <!--permission
+        android:name="com.mjhram.geodata.permission.C2D_MESSAGE"
+        android:protectionLevel="signature" /-->
+
+    <uses-permission android:name="android.permission.CALL_PHONE"/>
+    <!-- For Tableys, call phone may not be available, but let app to be installed on them by feature-required=false-->
+    <uses-feature android:name="android.hardware.telephony" android:required="false" />
+    <!--uses-permission android:name="com.mjhram.geodata.permission.C2D_MESSAGE" /-->
+    <!--uses-permission android:name="com.google.android.c2dm.permission.SEND" />
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" /-->
+    <!--uses-permission android:name="android.permission.WAKE_LOCK" /-->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.USE_CREDENTIALS" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="com.google.android.gms.permission.ACTIVITY_RECOGNITION" />
+    <uses-permission
+        android:name="android.permission.ACCESS_MOCK_LOCATION"
+        tools:ignore="MockLocation" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <!-- Creating Permission to receive Google Maps -->
+    <permission
+        android:name="com.mjhram.geodata.permission.MAPS_RECEIVE"
+        android:protectionLevel="signature" />
+    <!-- Permission to receive Google Maps -->
+    <uses-permission android:name="com.mjhram.geodata.permission.MAPS_RECEIVE" />
+    <!-- Maps API needs OpenGL ES 2.0. -->
+    <uses-feature
+        android:glEsVersion="0x00020000"
+        android:required="true" />
+
+    <application
+        android:name="com.mjhram.geodata.common.AppSettings"
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme">
+
+        <!-- Google Maps Fragment API Key Data -->
+        <meta-data
+            android:name="com.google.android.maps.v2.API_KEY"
+            android:value="@string/googleMapsApiKey" />
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+
+        <service android:name="com.mjhram.geodata.GpsLoggingService">
+            <intent-filter>
+                <action android:name="com.mjhram.geodata.GpsLoggingService" />
+            </intent-filter>
+        </service>
+
+        <activity
+            android:name="com.mjhram.geodata.GpsMainActivity"
+            android:configChanges="keyboardHidden|orientation|locale|layoutDirection"
+            android:label="@string/app_name"
+            android:uiOptions="splitActionBarWhenNarrow"
+            android:windowSoftInputMode="adjustNothing"
+            android:screenOrientation="portrait"
+            >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <!-- activity
+            android:name="com.mjhram.geodata.login_register.LoginActivity"
+            android:configChanges="keyboardHidden|orientation|locale|layoutDirection"
+            android:label="@string/app_name"
+            android:launchMode="singleTask"
+            android:uiOptions="splitActionBarWhenNarrow"
+            android:windowSoftInputMode="adjustNothing"
+            android:screenOrientation="portrait"
+            >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity -->
+        <activity
+            android:name="com.mjhram.geodata.login_register.RegisterActivity"
+            android:configChanges="keyboardHidden|orientation|locale|layoutDirection"
+            android:label="@string/app_name"
+            android:launchMode="singleTop"
+            android:windowSoftInputMode="adjustPan"
+            android:screenOrientation="portrait"
+            />
+        <activity
+            android:name="com.mjhram.geodata.MainPreferenceActivity"
+            android:configChanges="keyboardHidden|orientation|locale|layoutDirection"
+            android:label="@string/settings_screen_name"
+            android:parentActivityName="com.mjhram.geodata.GpsMainActivity"
+            android:screenOrientation="portrait"
+            >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.mjhram.geodata.GpsMainActivity" />
+
+            <intent-filter>
+                <action android:name="com.mjhram.geodata.MAIN_PREFS" />
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="authorize"
+                    android:scheme="gpslogger" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="com.mjhram.geodata.Faq.Faqtivity"
+            android:configChanges="keyboardHidden|orientation|locale|layoutDirection"
+            android:label="@string/faq_screen_title"
+            android:launchMode="singleTask"
+            android:parentActivityName="com.mjhram.geodata.GpsMainActivity"
+            android:screenOrientation="portrait"
+            >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.mjhram.geodata.GpsMainActivity" />
+        </activity>
+        <activity
+            android:name="com.mjhram.geodata.shortcuts.ShortcutCreate"
+            android:configChanges="keyboardHidden|orientation|locale|layoutDirection"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"
+            android:screenOrientation="portrait"
+            >
+            <intent-filter>
+                <action android:name="android.intent.action.CREATE_SHORTCUT" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="com.mjhram.geodata.shortcuts.ShortcutStart"
+            android:configChanges="keyboardHidden|orientation|locale|layoutDirection"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"
+            android:screenOrientation="portrait"
+            >
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="com.mjhram.geodata.shortcuts.ShortcutStop"
+            android:configChanges="keyboardHidden|orientation|locale|layoutDirection"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"
+            android:screenOrientation="portrait"
+            >
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+            </intent-filter>
+        </activity>
+
+        <!--service
+            android:name="com.mjhram.geodata.gcm_client.MyGcmListenerService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+            </intent-filter>
+        </service-->
+        <service
+            android:name=".gcm_client.MyGcmListenerService"
+            android:enabled="true"
+            android:exported="true"
+            >
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+        <service
+            android:name="com.mjhram.geodata.gcm_client.MyInstanceIDListenerService"
+            android:exported="true"
+            >
+            <intent-filter>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
+            </intent-filter>
+        </service>
+        <!--service
+            android:name="com.mjhram.geodata.gcm_client.RegistrationIntentService"
+            android:exported="false"></service-->
+
+        <!--receiver
+            android:name="com.google.android.gms.gcm.GcmReceiver"
+            android:exported="true"
+            android:permission="com.google.android.c2dm.permission.SEND">
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+                <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
+
+                <category android:name="com.mjhram.geodata" />
+            </intent-filter>
+        </receiver-->
+
+        <activity
+            android:name="com.mjhram.geodata.settings.ProfileActivity"
+            android:label="@string/title_activity_profile"
+            android:theme="@style/AppTheme"
+            android:screenOrientation="portrait"
+            ></activity>
+    </application>
+
+</manifest>

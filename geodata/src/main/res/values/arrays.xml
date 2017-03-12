@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="listeners">
+        <item>@string/listeners_gps</item>
+        <item>@string/listeners_cell</item>
+        <item>@string/listeners_passive</item>
+    </string-array>
+
+    <string-array name="languages">
+        <item>@string/str_default</item>
+        <item>English</item>
+        <item>عربي</item>
+    </string-array>
+
+    <string-array name="languages_code">
+        <item></item>
+        <item>en</item>
+        <item>ar</item>
+    </string-array>
+
+    <string-array name="phpErrorMsgs">
+        <!-- addTrequest://10-19 -->
+        <item> "no error. request added successfully"</item>
+        <item> "Passenger already has active request"</item>
+        <item> "Request couldn't be added"</item>
+        <!-- acceptTrequest://20- -->
+        <item> "no error. request updated successfully"</item>
+        <item> "Driver already has active request"</item>
+        <item> "Requests already assigned"</item>
+        <item> "Request couldn't be updated"</item>
+        <!-- login_register: 30- -->
+        <item> "successfull"</item>
+        <item> "Incorrect name or password!"</item>
+        <item> "User already existed"</item>
+        <item> "Error occured in Registartion"</item>
+        <item> "Unknow 'tag' value"</item>
+        <item> "Email is used"</item>
+        <item> "Name is used"</item>
+        <item> "Name and Email are used"</item>
+        <!-- logTaxiLoc: 40- -->
+        <item> "no error. location updated successfully"</item>
+        <item> "no error. location inserted successfully"</item>
+        <!-- updateRegId:50- -->
+        <item> "RegId updated successfully"</item>
+        <item> "Error while updating registeration id!"</item>
+        <!-- updateLoc: 60- -->
+        <item> "no error. location updated successfully"</item>
+        <item> "no error. location inserted successfully"</item>
+        <!-- updateTaxiLocation: 70- -->
+        <item> "no error. location inserted successfully"</item>
+        <item> "no error. location updated successfully"</item>
+        <item> "error inserting location"</item>
+        <item> "error updating location"</item>
+        <!-- updateTRequest: 80- -->
+        <item> "Request updated successfully"</item>
+        <item> "Error while updating the request!. Already assigned"</item>
+        <item> "Error while updating the request!. Request is already completed"</item>
+        <item> "Error while updating the request!"</item>
+        <!-- updateUserInfo: 90- -->
+        <item> "No error, info updated successfully"</item>
+        <item> "Error updating user info"</item>
+        <!-- uploadImage:100- -->
+        <item> "Image Uploaded Successfully"</item>
+        <item> "Error Uploading Image" </item>
+        <!-- verifyPhone:110- -->
+        <item> "Phone Verification Code generated successfully"</item>
+        <item> "Already Verified" </item>
+        <item> "Error Generating Code" </item>
+        <item> "Error Sending Code by Email" </item>
+        <item> "Error Verifying" </item>
+        <!-- verifyPhone-ConfirmCode:120- -->
+        <item> "Phone Confirmation successful"</item>
+        <item> "Verification Error" </item>
+        <item> "Already Verified" </item>
+        <item> "Verification Code is expired" </item>
+        <item> "Error updating info. Try later" </item>
+        <!-- isPhoneVerified:130- -->
+        <item> "Success"</item>
+        <item> "Phone is not verified" </item>
+        <item> "Error getting user info" </item>
+        <!-- forgot password:140- -->
+        <item> "Success. Reset link was sent to your email"</item>
+        <item> "Invalid email address. Please type a valid email" </item>
+        <item> "Account not found please signup now!!" </item>
+        <item> "Problem processing!!" </item>
+
+    </string-array>
+</resources>

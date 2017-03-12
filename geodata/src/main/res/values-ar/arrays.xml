@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="phpErrorMsgs">
+        <!-- addTrequest://10-19 -->
+        <item> "تم اضافة الطلب بنجاح"</item>
+        <item> "الراكب لديه طلب فعال مسبقا"</item>
+        <item> "لم تتم اضافة الطلب"</item>
+        <!-- acceptTrequest://20- -->
+        <item> "تم تحديث الطلب بنجاح"</item>
+        <item> "السائق لديه طلب فعال مسبقا"</item>
+        <item> "الطلب تم تخصيصه"</item>
+        <item> "لم يتم تحديث الطلب"</item>
+        <!-- login_register: 30- -->
+        <item> "نجاح"</item>
+        <item>"الاسم اوكلمة المرور خاطئة"</item>
+        <item> "المستخدم موجود"</item>
+        <item> "خطأ بالتسجيل"</item>
+        <item> "قيمة 'tag' خاطئة"</item>
+        <item>"الايميل مستخدم"</item>
+        <item>"الاسم مستخدم"</item>
+        <item>"الاسم والايميل مستخدمان"</item>
+        <!-- logTaxiLoc: 40- -->
+        <item> "تم تحديث الموقع بنجاح"</item>
+        <item> "تمت اضافة الموقع بنجاح"</item>
+        <!-- updateRegId:50- -->
+        <item> "تم تحديث رقم التسجيل"</item>
+        <item> "خطأ اثناء تحديث رقم التسجيل"</item>
+        <!-- updateLoc: 60- -->
+        <item> "تم تحديث الموقع بنجاح"</item>
+        <item> "تم اضافة الموقع بنجاح"</item>
+        <!-- updateTaxiLocation: 70- -->
+        <item> "تم تحديث الموقع بنجاح"</item>
+        <item> "تم اضافة الموقع بنجاح"</item>
+        <item> "خطأ باضافة الموقع"</item>
+        <item> "خطأ بتحديث الموقع"</item>
+        <!-- updateTRequest: 80- -->
+        <item> "تم تحديث الطلب"</item>
+        <item> "خطأ بتحديث الطلب. الطلب مخصص مسبقا"</item>
+        <item> "خطأ بتحديث الطلب. الطلب مكتمل"</item>
+        <item> "خطأ بتحديث الطلب!"</item>
+        <!-- updateUserInfo: 90- -->
+        <item> "تم تحديث البيانات"</item>
+        <item> "خطأ بتحديث البيانات"</item>
+        <!-- uploadImage:100- -->
+        <item> "تم رفع الصورة بنجاح"</item>
+        <item> "خطأ برفع الصورة" </item>
+        <!-- verifyPhone:110- -->
+        <item> "تمت عملية توليد رمز التأكيد بنجاح"</item>
+        <item> "الرقم مؤكد مسبقا" </item>
+        <item> "خطأ في توليد الرمز" </item>
+        <item> "خطا في ارسال البريد الالكتروني" </item>
+        <item>"خطأ في التأكيد"</item>
+        <!-- verifyPhone-ConfirmCode:120- -->
+        <item> "تمت العملية بنجاح"</item>
+        <item> "خطأ في العملية" </item>
+        <item> "الرقم مؤكد مسبقا" </item>
+        <item> "الرمز قديم" </item>
+        <item> "خطأ في التحديث. حاول لاحقا" </item>
+        <!-- isPhoneVerified:130- -->
+        <item> "تمت بنجاح"</item>
+        <item> "رقم الموبايل غير مؤكد" </item>
+        <item> "خطأ قي استرجاع بيانات المستخدم" </item>
+        <!-- forgot password:140- -->
+        <item> "تم ارسال رابط تغيير كلمة المرور الى بريدك الالكتروني"</item>
+        <item> "البربد الالكتروني غير صحيح. يرجى التحقق منه" </item>
+        <item> "البريد الالكتروني غير موجود، يرجى التسجيل" </item>
+        <item> "خطأ في العملية" </item>
+
+    </string-array>
+
+</resources>

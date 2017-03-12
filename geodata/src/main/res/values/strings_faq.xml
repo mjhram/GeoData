@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="faq_generalsection">General questions</string>
+    <string name="faq_preferencesandfilters">Preferences and filters</string>
+    <string name="faq_advancedsection">Advanced topics</string>
+    <string name="faq_topic_whyisntitaccurate"><![CDATA[<h3>How can I improve accuracy?</h3>
+    <p>Under the performance menu\'s location providers you have a few options; using <b>GPS satellites will give you better accuracy</b> but take a longer time; using network location will give worse accuracy but is quicker.</p>
+     <p>You may also want to check your environment, as there can be inaccuracy due to clouds, buildings, sunspots, etc.</p>
+    <p>Ultimately, it all comes down to your hardware, settings and environment. The accuracy is only as good as your phone\'s GPS chip.</p>
+    ]]></string>
+    <string name="faq_topic_howtoremovenotification"><![CDATA[<h3>Can I remove the notification?</h3>         <p>Unfortunately, and annoyingly, the notification needs to stay there. Android 4.x became quite restrictive</a> and kills foreground services that don\'t show notifications. There is also no way to work around this as there was in the past.</p>         <p>This also means that more applications will start to ask for notification area space, it may get quite crowded soon. At the same time, this is with good reason; the user should know that a foreground service is running and consuming resources, however no means has been provided to allow it to be dismissed.</p>         <p>]]></string>
+    <string name="faq_topic_howgpsworks"><![CDATA[
+    <h3>How GPS works (detail)</h3>
+    <p>The gist of a phone using GPS is that it needs to know where every satellite in the GPS constellation is and it usually                     wants to use your data connection to do this.  The GPS satellites do broadcast this information at different intervals;  specifically, each satellite broadcasts <em>almanac</em> data and <em>ephemeris</em> data.  </p>                      <p>The almanac is not very precise and gives a rough overview of the constellation and their positions over the next few months.                         A GPS receiver can use this to get a rough idea of where it is and which satellites to select.  When a phone has been off                         for a long time, or suddenly shifted to a new location, it needs to reacquire almanac data.</p>                      <p>The ephemeris data is more precise; it is broadcast more frequently and goes stale quite quickly.  It\'s only once a GPS                         receiver has its almanac data that it knows to look for the ephemeris data.  Once the phone has both of these pieces of information,                         it can then figure out where it is.  This process can take around 12 minutes and is known to be very flaky; any interference                         or interruption in the process means that the GPS receiver in the phone needs to start over.  The satellites only broadcast at                         50 bytes/second.</p>                      <p>Because it takes so long, to assist with this, many mobile operators deploy <a href=\"http://en.wikipedia.org/wiki/Assisted_GPS#Basic_concepts\">aGPS</a> servers;                         these servers have already downloaded the almanac and ephemeris data and your phone can download it from them at a faster rate then                         from the satellites.  But it does mean that your phone has to be on a familiar network.  Being on roaming or with a restricted                         data plan will prevent this from happening.</p>                      <p>All in all, there are a lot of factors at play.  The problem could be anything from missing almanacs to data to hardware.  App simply waits for the OS to be ready with its information.</p>
+    ]]></string>
+    <string name="faq_topic_whydoesfixtakelongtime"><![CDATA[
+    <h3>Why is it taking so long to find a fix?</h3>
+        <p>Sometimes it will feel like App is simply doing nothing and is just unable to find a fix. There can be several reasons for this.</p>
+        <p><strong>New location</strong> - if you are at a new location after a long flight, the GPS on your phone can take a while to reorient itself. Try running App at high frequency until it does find a location. This can take around 15-20 minutes.</p>
+        <p><strong>Interference</strong> - there may be structures nearby blocking your signal.</p>
+        <p><strong>Mid flight</strong> - if you are in a commercial aircraft, you are probably traveling too fast for your phone\'s hardware to keep up with the GPS signals.</p>
+        <p><strong>Strict filters</strong> - if a fix is found and it doesn\'t match your filter criteria, App will keep trying for a while before it gives up.  Consider being less strict with settings like accuracy or distance traveled.  Consider also using network or passive locations.</p>
+    ]]></string>
+
+    <string name="faq_topic_whatvariousfiltersmean"><![CDATA[
+    <h3>Explanation of various filters</h3>
+    <strong>Time before logging</strong> - How long to wait after a point has been logged to try logging again.
+    <br /><br/><strong>Distance filter</strong> - When a point is available, the app will check to ensure that this much distance exists between the previous and current points. If it isn\'t this distance, the point is discarded.
+    <br /><br/><strong>Accuracy filter</strong> - When a point is available, the app will check to ensure that this point has a minimum accuracy specified.  If it does not match the specified accuracy, the point is discarded. This is useful if you are inside a building for a while.
+    <br /><br/><strong>Retry time interval for accuracy</strong> - If the above accuracy filter isn\'t matched, the app will keep retrying for this long.
+    <br /><br/><strong>Absolute timeout</strong> - Attempts to acquire a fix will stop after this long, regardless of other filter settings. This is useful if you are inside a building for a while.
+    ]]></string>
+
+
+    <string name="faq_topic_loadingpresets"><![CDATA[
+    <h3>Loading preset preferences</h3>
+    <p>Many users want to distribute App to colleagues, pre-installed on phones with some preset values. If you create a file in the default folder or at <font face=\"monospace\" color=\"#4CAF50\">/<i>&lt;sdcard&gt;</i>/geodata.properties</font>, then App will read this file each time it loads and apply those settings to the application.</p>
+    <p>For example, in the file you can put <font face=\"monospace\" color=\"#4CAF50\">accuracy_before_logging=42</font> and that will reset the Accuracy Filter to 42 meters each time the application starts. There are many properties that can be applied. Here are some of the most common ones:</p>
+     <blockquote>
+     <font face=\"monospace\" color=\"#4CAF50\">listeners</font> - Which location providers to listen to (GPS, network, passive). Specify these using commas, for example <font face=\"monospace\" color=\"#4CAF50\">gps,passive</font> <br /><br />
+
+     </blockquote>
+    </p>
+    ]]></string>
+
+
+</resources>
