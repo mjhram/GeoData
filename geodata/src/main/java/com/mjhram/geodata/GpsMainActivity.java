@@ -1186,6 +1186,7 @@ public class GpsMainActivity extends GenericViewFragment
                     .fillColor(Color.BLUE));
             locationMarkers.add(polygon);*/
 
+
             BitmapDescriptor bmp;
             float spd = info.loc.getSpeed();
             if(spd <1.0) {//3.6km/h
