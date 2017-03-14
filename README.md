@@ -1,14 +1,20 @@
-**GeoData** is a Taxi Dispatcher Project which has two parts:<br />**A. GeoData:** is the Driver Version used to receive Taxi requests and accept one of them by the driver.<br />**B. GeoDataPassenger:** used by passengers to put a request for Taxi and wait for a driver to accept it.<br /><br />This is the **GeoData**.<br /><br />The project was developed based on multiple opensource projects:<br />1. GPSLogger was used for tracking Taxi location and movement<br />2. Login/Register based on tutorial from Ravi Tamada
+**GeoData** is a tool to record and track moving from place to another with markers indicating the speed.
+The movement can be shared to others using the Share Action Menu.<br /><br />The project was developed based on multiple opensource projects:<br />
 
-<br />**Project Dependencies:**<br />- afollestad:material-dialogs<br />
-- heinrichreimersoftware.materialdrawer<br />
-- birbit:android-priority-jobqueue<br />
-- greenrobot:eventbus<br />
-- ms-square:expandableTextView<br />
-- com.yalantis:phoenix (Pull-to-Refresh listview)<br />
+-  GPSLogger was used for logging location and movement<br />
+-  MarkerBuilder was used for resizable circle marker<br />
 
-The project was build using latest Android Studio 2.0 Beta 5.<br />
-The project is still **under work/modificaiton**
+<br />**Project Dependencies:**<br />
+
+- afollestad:material-dialogs
+- heinrichreimersoftware.materialdrawer
+- birbit:android-priority-jobqueue
+- greenrobot:eventbus
+- ms-square:expandableTextView
+- com.yalantis:phoenix (Pull-to-Refresh listview)
+- com.github.ac-opensource:MarkerBuilder
+
+The project was built using latest Android Studio 2.0 <br />
 
 **Requirements:**<br />
 
