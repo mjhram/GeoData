@@ -24,7 +24,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -38,6 +40,8 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -46,6 +50,7 @@ import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.aconcepcion.geofencemarkerbuilder.MarkerBuilderManagerV2;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
@@ -80,6 +85,9 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Properties;
@@ -115,6 +123,7 @@ public class GpsMainActivity extends GenericViewFragment
     //private TRequestObj selectedTRequest = null;
     private DrawerLayout mDrawerLayout;
     public SQLiteHandler dbhandler;
+    private MarkerBuilderManagerV2 markerBuilderManager;
 
     public class btnOnClickListener implements View.OnClickListener {
         public void onClick(View v) {//start new trip when start or stop service
@@ -229,11 +238,23 @@ public class GpsMainActivity extends GenericViewFragment
         }
     };*/
 
+    private void setUpMap(GoogleMap mMap) {
+        markerBuilderManager = new MarkerBuilderManagerV2.Builder(this)
+                .map(mMap)
+                .enabled(true)
+                .radius(1000)
+                .minRadius(200)
+                .maxRadius(5000)
+                .fillColor(0x500000ff)
+                .build();
+    }
+
     @Override
     public void onMapReady(GoogleMap map) {
         map.setMyLocationEnabled(true);
         //map.setOnMyLocationButtonClickListener(this);
         googleMap = map;
+        setUpMap(googleMap);
 
     }
 
@@ -1189,15 +1210,28 @@ public class GpsMainActivity extends GenericViewFragment
 
             BitmapDescriptor bmp;
             float spd = info.loc.getSpeed();
-            if(spd <1.0) {//3.6km/h
-                bmp = BitmapDescriptorFactory.fromResource(R.drawable.arrowup_red);
-            } else if(spd>=1 && spd<6) {//21km/h
-                bmp = BitmapDescriptorFactory.fromResource(R.drawable.arrowup_orange);
-            } else if(spd>=6 && spd<12) {//43km/h
-                bmp = BitmapDescriptorFactory.fromResource(R.drawable.arrowup_cyan);
-            } else //if(spd>=12 && spd<20)
-            {//72km/h
-                bmp = BitmapDescriptorFactory.fromResource(R.drawable.arrowup_green);
+            if(info.loc.hasBearing()) {
+                if (spd < 1.0) {//3.6km/h
+                    bmp = BitmapDescriptorFactory.fromResource(R.drawable.arrowup_red);
+                } else if (spd >= 1 && spd < 6) {//21km/h
+                    bmp = BitmapDescriptorFactory.fromResource(R.drawable.arrowup_orange);
+                } else if (spd >= 6 && spd < 12) {//43km/h
+                    bmp = BitmapDescriptorFactory.fromResource(R.drawable.arrowup_cyan);
+                } else //if(spd>=12 && spd<20)
+                {//72km/h
+                    bmp = BitmapDescriptorFactory.fromResource(R.drawable.arrowup_green);
+                }
+            }else{
+                if (spd < 1.0) {//3.6km/h
+                    bmp = BitmapDescriptorFactory.fromResource(R.drawable.circle_red);
+                } else if (spd >= 1 && spd < 6) {//21km/h
+                    bmp = BitmapDescriptorFactory.fromResource(R.drawable.circle_orange);
+                } else if (spd >= 6 && spd < 12) {//43km/h
+                    bmp = BitmapDescriptorFactory.fromResource(R.drawable.circle_cyan);
+                } else //if(spd>=12 && spd<20)
+                {//72km/h
+                    bmp = BitmapDescriptorFactory.fromResource(R.drawable.circle_grn);
+                }
             }
             MarkerOptions markerOptions = new MarkerOptions()
                     .position(driverPosition)
@@ -1214,7 +1248,7 @@ public class GpsMainActivity extends GenericViewFragment
         }
 
         //check and remove old info
-        long now = System.currentTimeMillis();
+        /*long now = System.currentTimeMillis();
         for(int k=0; k<myinfoList.size(); k++) {
             MyInfo aInfo = myinfoList.get(k);
             if(aInfo.loc.getTime() < now - 1*3600*1000) { //1hour before now
@@ -1225,7 +1259,7 @@ public class GpsMainActivity extends GenericViewFragment
             } else {
                 break;
             }
-        }
+        }*/
 
     }
 
@@ -1265,5 +1299,133 @@ public class GpsMainActivity extends GenericViewFragment
         showDialog();
         dbhandler.calc();
         hideDialog();
+    }
+
+    /*public void onShotClicked(View v) {
+        captureScreen();
+    }
+
+
+    // This method returns black gmaps screen
+    private Uri takeScreenshot() {
+        Date now = new Date();
+        android.text.format.DateFormat.format("yyyy-MM-dd_hh:mm:ss", now);
+
+        try {
+            // image naming and path  to include sd card  appending name you choose for file
+            String mPath = Environment.getExternalStorageDirectory().toString() + "/" + now + ".jpg";
+
+            // create bitmap screen capture
+            View v1 = getWindow().getDecorView().getRootView();
+            v1.setDrawingCacheEnabled(true);
+            Bitmap bitmap = Bitmap.createBitmap(v1.getDrawingCache());
+            v1.setDrawingCacheEnabled(false);
+
+            File imageFile = new File(mPath);
+
+            FileOutputStream outputStream = new FileOutputStream(imageFile);
+            int quality = 100;
+            bitmap.compress(Bitmap.CompressFormat.JPEG, quality, outputStream);
+            outputStream.flush();
+            outputStream.close();
+            Toast.makeText(this, "Stored in: " + mPath, Toast.LENGTH_LONG).show();
+            //openScreenshot(imageFile);
+            return Uri.fromFile(imageFile);
+        } catch (Throwable e) {
+            // Several error may come out with file handling or OOM
+            e.printStackTrace();
+        }
+        return null;
+    }*/
+
+    //private ShareActionProvider mShareActionProvider;
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate menu resource file.
+        getMenuInflater().inflate(R.menu.action_menu, menu);
+        // Locate MenuItem with ShareActionProvider
+        //MenuItem item = menu.findItem(R.id.menu_item_share);
+        // Fetch and store ShareActionProvider
+        //mShareActionProvider = (ShareActionProvider) item.getActionProvider();
+        // Return true to display menu
+        return true;
+    }
+
+    // Call to update the share intent
+    /*private void setShareIntent(Intent shareIntent) {
+        if (mShareActionProvider != null) {
+            mShareActionProvider.setShareIntent(shareIntent);
+        }
+    }*/
+
+    public void captureAndShareGMap()
+    {
+        GoogleMap.SnapshotReadyCallback callback = new GoogleMap.SnapshotReadyCallback()
+        {
+
+            @Override
+            public void onSnapshotReady(Bitmap snapshot)
+            {
+                // TODO Auto-generated method stub
+                //bitmap = snapshot;
+                String filePath = System.currentTimeMillis() + ".jpeg";
+                filePath = Environment.getExternalStorageDirectory().toString() + "/" + filePath;
+                try
+                {
+                    File imageFile = new File(filePath);
+
+                    FileOutputStream fout = new FileOutputStream(imageFile);
+                    // Write the string to the file
+                    snapshot.compress(Bitmap.CompressFormat.JPEG, 90, fout);
+                    fout.flush();
+                    fout.close();
+                    //Toast.makeText(GpsMainActivity.this, "Stored in: " + filePath, Toast.LENGTH_LONG).show();
+                    Intent shareIntent = new Intent();
+                    shareIntent.setAction(Intent.ACTION_SEND);
+                    shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(imageFile));
+                    shareIntent.setType("image/jpeg");
+                    startActivity(Intent.createChooser(shareIntent, "Sahre..."));
+
+                }
+                catch (FileNotFoundException e)
+                {
+                    // TODO Auto-generated catch block
+                    Log.d("ImageCapture", "FileNotFoundException");
+                    Log.d("ImageCapture", e.getMessage());
+                    filePath = "";
+                }
+                catch (IOException e)
+                {
+                    // TODO Auto-generated catch block
+                    Log.d("ImageCapture", "IOException");
+                    Log.d("ImageCapture", e.getMessage());
+                    filePath = "";
+                }
+
+                //openShareImageDialog(filePath);
+            }
+        };
+
+        googleMap.snapshot(callback);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_item_share:
+                //Uri imageUri = takeScreenshot();
+                /*Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+                sharingIntent.setType("text/plain");
+                String shareBodyText = "Check it out. Your message goes here";
+                sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT,"Subject here");
+                sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBodyText);
+                startActivity(Intent.createChooser(sharingIntent, "Sharing Option"));*/
+                captureAndShareGMap();
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 }

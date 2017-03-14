@@ -16,7 +16,7 @@
         android:numeric="integer"
         android:maxLength="4"
         android:hint="@string/time_before_logging_hint"
-        android:defaultValue="10"/>
+        android:defaultValue="0"/>
 
     <com.mjhram.geodata.views.component.CustomSwitchPreference
         android:key="keep_fix"
@@ -42,7 +42,7 @@
         android:dialogTitle="@string/settings_accuracy_in_meters"
         android:numeric="integer"
         android:maxLength="4"
-        android:defaultValue="0"
+        android:defaultValue="30"
         android:hint="@string/settings_enter_meters"/>
 
     <com.afollestad.materialdialogs.prefs.MaterialEditTextPreference

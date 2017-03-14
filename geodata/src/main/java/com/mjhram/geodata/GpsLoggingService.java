@@ -36,6 +36,7 @@ import android.os.IBinder;
 import android.os.SystemClock;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
+import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -755,12 +756,6 @@ public class GpsLoggingService extends Service  {
 
         tracer.debug("Has description? " + Session.hasDescription() + ", Single point? " + Session.isSinglePointMode() + ", Last timestamp: " + Session.getLatestTimeStamp());
 
-        // Don't log a point until the user-defined time has elapsed
-        // However, if user has set an annotation, just log the point, disregard any filters
-        if (!Session.hasDescription() && !Session.isSinglePointMode() && (currentTimeStamp - Session.getLatestTimeStamp()) < (AppSettings.getMinimumLoggingInterval() * 1000)) {
-            return;
-        }
-
         //Don't log a point if user has been still
         // However, if user has set an annotation, just log the point, disregard any filters
         if(userHasBeenStillForTooLong()) {
@@ -771,11 +766,10 @@ public class GpsLoggingService extends Service  {
         if(!isFromValidListener(loc)){
             return;
         }
-
-        if(!loc.hasAccuracy() || !loc.hasBearing() || !loc.hasSpeed() ) {
+        Log.d("GPS Logging:", String.format("A-%b B-%b S-%b", loc.hasAccuracy(), loc.hasBearing(), loc.hasSpeed()));
+        if(!loc.hasAccuracy() || !loc.hasSpeed() /*|| !loc.hasBearing()*/) {
             return;
         }
-
 
         boolean isPassiveLocation = loc.getExtras().getBoolean("PASSIVE");
 
@@ -810,6 +804,60 @@ public class GpsLoggingService extends Service  {
                 this.firstRetryTimeStamp = 0;
             }
         }
+        // accuracy condition is met:
+        //add location to buffer (#locations 10, or deltaTime<30sec)
+        UploadClass.addLoc2buffer(loc);
+
+        //Check for time or distance:
+        boolean bTimeIntervalMet, bDistanceTraveledMet=false;
+        if (!Session.hasDescription() && !Session.isSinglePointMode()){
+            if ((currentTimeStamp - Session.getLatestTimeStamp()) < (AppSettings.getMinimumLoggingInterval() * 1000)) {
+                bTimeIntervalMet = false;
+                //return;
+            } else {
+                bTimeIntervalMet = true;
+            }
+            if(AppSettings.getMinimumDistanceInterval() > 0 && Session.hasValidLocation()) {
+                double distanceTraveled = Utilities.CalculateDistance(loc.getLatitude(), loc.getLongitude(),
+                        Session.getCurrentLatitude(), Session.getCurrentLongitude());
+
+                if (AppSettings.getMinimumDistanceInterval() > distanceTraveled) {
+                    tracer.warn(String.format(getString(R.string.not_enough_distance_traveled), String.valueOf(Math.floor(distanceTraveled))) + ", point discarded");
+                    //StopManagerAndResetAlarm();
+                    bDistanceTraveledMet = false;
+                    //return;
+                } else {
+                    bDistanceTraveledMet = true;
+                }
+            }
+            //check for Duration/Distance Interval=0
+            //A. if both intervals are zero => continue normally
+            if(AppSettings.getMinimumLoggingInterval() == 0 && AppSettings.getMinimumDistanceInterval() == 0){
+            } else {
+                //if only one interval is zero
+                // B. Time interval is 0 => neglect Time interval
+                if(AppSettings.getMinimumLoggingInterval() == 0){
+                    bTimeIntervalMet=false;
+                }
+                // B. Distance interval is 0 => neglect distance interval
+                if(AppSettings.getMinimumDistanceInterval() == 0){
+                    bDistanceTraveledMet=false;
+                }
+            }
+            if(bTimeIntervalMet==false){
+                if(bDistanceTraveledMet==false) {
+                    StopManagerAndResetAlarm();
+                    return;
+                }
+            }
+        }
+
+        /*
+        // Don't log a point until the user-defined time has elapsed
+        // However, if user has set an annotation, just log the point, disregard any filters
+        if (!Session.hasDescription() && !Session.isSinglePointMode() && (currentTimeStamp - Session.getLatestTimeStamp()) < (AppSettings.getMinimumLoggingInterval() * 1000)) {
+            return;
+        }
 
         //Don't do anything until the user-defined distance has been traversed
         // However, if user has set an annotation, just log the point, disregard any filters
@@ -823,8 +871,7 @@ public class GpsLoggingService extends Service  {
                 StopManagerAndResetAlarm();
                 return;
             }
-        }
-
+        }*/
 
         tracer.info(SessionLogcatAppender.MARKER_LOCATION, String.valueOf(loc.getLatitude()) + "," + String.valueOf(loc.getLongitude()));
         AdjustAltitude(loc);

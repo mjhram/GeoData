@@ -45,7 +45,7 @@ public class Session extends Application {
     private static double totalTravelled;
     private static int numLegs;
     private static boolean isBound;
-    private static String description = "";
+    //private static String description = "";
     private static boolean isSinglePointMode = false;
     private static int retryTimeout = 0;
     private static boolean waitingForLocation;
@@ -302,10 +302,10 @@ public class Session extends Application {
     }
 
     public static boolean hasDescription() {
-        return !(description.length() == 0);
+        return false;//!(description.length() == 0);
     }
 
-    public static String getDescription() {
+    /*public static String getDescription() {
         return description;
     }
 
@@ -315,7 +315,7 @@ public class Session extends Application {
 
     public static void setDescription(String newDescription) {
         description = newDescription;
-    }
+    }*/
 
     public static void setWaitingForLocation(boolean waitingForLocation) {
         Session.waitingForLocation = waitingForLocation;

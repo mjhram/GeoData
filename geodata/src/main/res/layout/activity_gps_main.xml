@@ -157,6 +157,19 @@
                 android:layout_above="@+id/btnAcceptedTask"
                 android:layout_marginBottom="10dp"
                 android:onClick="onGetDataClicked"
+                />
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="ScreenShot"
+                android:id="@+id/btnScrShot"
+                android:textSize="20dp"
+                android:textColor="@android:color/black"
+                android:background="@color/ajerliColor"
+                android:layout_above="@+id/btnAcceptedTask"
+                android:layout_marginBottom="10dp"
+                android:onClick="onShotClicked"
                 /-->
 
             <Button

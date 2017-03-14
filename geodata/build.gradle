@@ -102,7 +102,7 @@ android {
     compileSdkVersion 23
     buildToolsVersion "23.0.1"
     defaultConfig {
-        minSdkVersion 14
+        minSdkVersion 15
         targetSdkVersion 19
         versionName '1.9'
         applicationId 'com.mjhram.geodata'
@@ -158,7 +158,7 @@ android {
         }
     }
     //Copies final APK to this directory
-    assembleRelease.doLast {
+    /*assembleRelease.doLast {
         copy {
             from "build/outputs/apk/geodata-release.apk"
             into "./"
@@ -168,7 +168,7 @@ android {
                 fileName.replace('release', android.defaultConfig.versionName)
             }
         }
-    }
+    }*/
     //Predexing libraries takes up too much memory and causes travis-ci to choke
     dexOptions {
         preDexLibraries = false
@@ -187,24 +187,25 @@ dependencies {
     //use Firebase messaging instead of GCM messaging
     compile 'com.google.firebase:firebase-messaging:9.2.0'
     compile 'com.google.firebase:firebase-core:9.2.0'
-    //compile 'com.google.android.gms:play-services-drive:7.5.0'
+    //compile 'com.github.ac-opensource:MarkerBuilder:v1.0.0'
+    // compile 'com.google.android.gms:play-services-drive:7.5.0'
     //compile 'commons-net:commons-net:2.0' //for 'ftp' upload
     /*compile('org.apache.httpcomponents:httpmime:4.0.3') {
-                                                                                            exclude module: 'commons-logging'
-                                                                                            exclude module: 'httpcore'
-                                                                                            exclude module: 'httpclient'
-                                                                                        }
-                                                                                        compile('org.apache.james:apache-mime4j:0.6.1') {
-                                                                                            exclude module: 'commons-logging'
-                                                                                        }*/
+                                                                                                    exclude module: 'commons-logging'
+                                                                                                    exclude module: 'httpcore'
+                                                                                                    exclude module: 'httpclient'
+                                                                                                }
+                                                                                                compile('org.apache.james:apache-mime4j:0.6.1') {
+                                                                                                    exclude module: 'commons-logging'
+                                                                                                }*/
     /*compile('oauth.signpost:signpost-commonshttp4:1.2.1.1') {
-                                                                                            exclude module: 'commons-logging'
-                                                                                            exclude module: 'httpcore'
-                                                                                            exclude module: 'httpclient'
-                                                                                        }
-                                                                                        compile('oauth.signpost:signpost-core:1.2.1.1') {
-                                                                                            exclude module: 'commons-codec'
-                                                                                        }*/
+                                                                                                    exclude module: 'commons-logging'
+                                                                                                    exclude module: 'httpcore'
+                                                                                                    exclude module: 'httpclient'
+                                                                                                }
+                                                                                                compile('oauth.signpost:signpost-core:1.2.1.1') {
+                                                                                                    exclude module: 'commons-codec'
+                                                                                                }*/
     //compile 'com.googlecode.json-simple:json-simple:1.1'
     //Logging
     compile 'org.slf4j:slf4j-api:1.7.6'
@@ -232,6 +233,7 @@ dependencies {
     compile('com.crashlytics.sdk.android:crashlytics:2.5.5@aar') {
         transitive = true;
     }
+    compile project(':geofencemarkerbuilder')
 }
 
 tasks.whenTaskAdded { task ->

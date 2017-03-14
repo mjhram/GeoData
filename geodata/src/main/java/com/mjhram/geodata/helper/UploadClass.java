@@ -2,6 +2,7 @@ package com.mjhram.geodata.helper;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.location.Location;
 import android.util.Log;
 
 import com.android.volley.Request;
@@ -16,6 +17,7 @@ import com.mjhram.geodata.common.events.ServiceEvents;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,6 +39,7 @@ public class UploadClass {
 
     private static final String TAG = UploadClass.class.getSimpleName();
     private phpErrorMessages phpErrorMsgs;
+    public static ArrayList<Location> locationsBuffer=null;
 
     public UploadClass(Context theCx) {
         phpErrorMsgs = AppSettings.getInstance().getPhpErrorMsg();
@@ -726,11 +729,72 @@ public class UploadClass {
 
     }
     */
+    private static final int locationExpiryTime = 30000;//30 sec
+    private static final int maxLocBuffer = 10;
+    static public void addLoc2buffer(Location loc){
+        if(locationsBuffer == null){
+            locationsBuffer = new ArrayList<>();
+        }
+        //remove old locations
+        long tmpTime = loc.getTime();
+        for (Location tmpLoc:  locationsBuffer) {
+            if(tmpTime-tmpLoc.getTime() > locationExpiryTime){
+                locationsBuffer.remove(tmpLoc);
+            }
+        }
+        if(locationsBuffer.size()>=maxLocBuffer) {
+            locationsBuffer.remove(0);
+        }
+        locationsBuffer.add(loc);
+    }
+
+    private static Location getFinalLocation(Location lastLoc){
+        Location loc = lastLoc;
+        //do averaging or clustering:
+        int bufSize = locationsBuffer.size();
+        float initialBearing=0, initialSpeed=0, initialAccuracy=0;
+        int nHasBearing=0;
+        for (Location tmpLoc:  locationsBuffer) {
+            if(tmpLoc.hasBearing()) {
+                initialBearing += tmpLoc.getBearing();
+                nHasBearing ++;
+            }
+            initialSpeed += tmpLoc.getSpeed();
+            initialAccuracy += tmpLoc.getAccuracy();
+        }
+        if(nHasBearing!=0) {
+            initialBearing /= nHasBearing;
+        }
+        initialSpeed /= bufSize;
+        initialAccuracy /= bufSize;
+
+        for (Location tmpLoc:  locationsBuffer) {
+            //IIR filter y=.3x+.7y
+            if(tmpLoc.hasBearing()) {
+                initialBearing = .3f * tmpLoc.getBearing() + .7f * initialBearing;
+            }
+            initialSpeed = .3f*tmpLoc.getSpeed()+.7f*initialSpeed;
+            initialAccuracy = .3f*tmpLoc.getAccuracy()+.7f*initialAccuracy;
+        }
+        if(nHasBearing == 0) {
+            loc.removeBearing();
+        } else {
+            loc.setBearing(initialBearing);
+        }
+
+        loc.setSpeed(initialSpeed);
+        loc.setAccuracy(initialAccuracy);
+
+        locationsBuffer.clear();
+        return loc;
+    }
+
     public static void updateLoc(final MyInfo info) {
         String tag_string_req = "updateLoc";
         final boolean avState = info.updateStateOnly;
         System.out.print(avState);
 
+        info.loc = getFinalLocation(info.loc);
         EventBus.getDefault().post(new ServiceEvents.LocationUpdate(info.loc));
 
         StringRequest strReq = new StringRequest(Request.Method.POST,
