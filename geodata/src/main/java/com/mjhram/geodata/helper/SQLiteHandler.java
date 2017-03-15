@@ -12,40 +12,36 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.location.Location;
-import android.os.Environment;
 import android.util.Log;
-import android.widget.Toast;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.channels.FileChannel;
-import java.util.HashMap;
+import com.mjhram.geodata.common.AppSettings;
 
 public class SQLiteHandler extends SQLiteOpenHelper {
     private static final String TAG = SQLiteHandler.class.getSimpleName();
     // All Static variables
     // Database Version
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 3;
     // Database Name
     private static final String DATABASE_NAME = "geodb.db";
     // Login table name
-    private static final String TABLE_GEODATA = "geodata";
+    //private static final String TABLE_GEODATA = "geodata";
+    private static final String TABLE_MARKERS = "tblMarkers";
     // Login Table Columns names
     private static final String KEY_ID = "id";
-    private static final String KEY_TIME = "time";
-    private static final String KEY_UID = "userid";
+    //private static final String KEY_TIME = "time";
+    //private static final String KEY_UID = "userid";
     private static final String KEY_LAT = "lat";
     private static final String KEY_LONG = "long";
     private static final String KEY_SPEED = "speed";
     private static final String KEY_BEARING = "bearing";
     private static final String KEY_ACC = "accuracy";
     private static final String KEY_FIXTIME = "fixtime";
-    private static final String KEY_INFO = "hasinfo";
-    private static final String KEY_RMV = "shouldRmv";
-    private static final String KEY_CALC_SPEED = "calcSpeed";
-    private static final String KEY_CALC_BEARING = "calcBearing";
+    //private static final String KEY_INFO = "hasinfo";
+    //private static final String KEY_RMV = "shouldRmv";
+    //private static final String KEY_CALC_SPEED = "calcSpeed";
+    //private static final String KEY_CALC_BEARING = "calcBearing";
+    private static final String KEY_HASBEARING = "hasbearing";
+    private static final String KEY_TRIPID = "tripid";
 
     public SQLiteHandler(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -53,14 +49,22 @@ public class SQLiteHandler extends SQLiteOpenHelper {
     // Creating Tables
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String CREATE_LOGIN_TABLE = "CREATE TABLE " + TABLE_GEODATA + "("
+        /*String CREATE_LOGIN_TABLE = "CREATE TABLE " + TABLE_GEODATA + "("
             + KEY_ID + " INTEGER PRIMARY KEY," + KEY_TIME + " TEXT,"
             + KEY_UID + " INTEGER ," + KEY_LAT + " TEXT," + KEY_LONG + " TEXT,"
             + KEY_SPEED + " REAL ," + KEY_BEARING + " REAL," + KEY_ACC + " REAL,"
             + KEY_FIXTIME + " INTEGER , " + KEY_INFO + " TEXT , "
             + KEY_RMV + " INTEGER , "
             + KEY_CALC_SPEED + " REAL , " + KEY_CALC_BEARING + " REAL" + ")";
-        db.execSQL(CREATE_LOGIN_TABLE);
+        db.execSQL(CREATE_LOGIN_TABLE);*/
+        String CREATE_MARKERS_TABLE = "CREATE TABLE " + TABLE_MARKERS + "("
+                + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,"
+                + KEY_LAT + " REAL," + KEY_LONG + " REAL,"
+                + KEY_SPEED + " REAL ," + KEY_BEARING + " REAL," + KEY_ACC + " REAL,"
+                + KEY_TRIPID+ " TEXT,"
+                + KEY_FIXTIME + " INTEGER , " + KEY_HASBEARING + " INTEGER "
+                + ")";
+        db.execSQL(CREATE_MARKERS_TABLE);
 
         Log.d(TAG, "Database tables created");
     }
@@ -68,7 +72,8 @@ public class SQLiteHandler extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // Drop older table if existed
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_GEODATA);
+        //db.execSQL("DROP TABLE IF EXISTS " + TABLE_GEODATA);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_MARKERS);
 
         // Create tables again
         onCreate(db);
@@ -76,29 +81,30 @@ public class SQLiteHandler extends SQLiteOpenHelper {
     /**
      * Storing user details in database
      * */
-    public void addData(long idx, String time, int uid, String lat, String lng,
-                        double speed, double bearing, double acc, long fixtime, String info) {
+    public void addData(Location loc) {
+        if(AppSettings.getTripId().equals("-1")) {
+            //don't add loc
+            return;
+        }
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        values.put(KEY_ID, idx);
-        values.put(KEY_TIME, time);
-        values.put(KEY_UID, uid);
-        values.put(KEY_LAT, lat);
-        values.put(KEY_LONG, lng);
-        values.put(KEY_SPEED, speed);
-        values.put(KEY_BEARING, bearing);
-        values.put(KEY_ACC, acc);
-        values.put(KEY_FIXTIME, fixtime);
-        values.put(KEY_INFO, info);
+        values.put(KEY_LAT, loc.getLatitude());
+        values.put(KEY_LONG, loc.getLongitude());
+        values.put(KEY_SPEED, loc.getSpeed());
+        values.put(KEY_BEARING, loc.getBearing());
+        values.put(KEY_ACC, loc.getAccuracy());
+        values.put(KEY_FIXTIME, loc.getTime());
+        values.put(KEY_HASBEARING, loc.hasBearing()?1:0);
+        values.put(KEY_TRIPID, AppSettings.getTripId());
 
         // Inserting Row
-        long id = db.insert(TABLE_GEODATA, null, values);
+        long id = db.insert(TABLE_MARKERS, null, values);
         db.close(); // Closing database connection
-
         //Log.d(TAG, "New user inserted into sqlite: " + id);
     }
 
+    /*
     public void calc() {
         String selectQuery = "SELECT * FROM " + TABLE_GEODATA;
             selectQuery+=" ORDER BY "+SQLiteHandler.KEY_ID+","+SQLiteHandler.KEY_FIXTIME;
@@ -161,9 +167,10 @@ public class SQLiteHandler extends SQLiteOpenHelper {
         cursor.close();
         db.close();
     }
+    */
     /**
     * Getting user data from database
-    * */
+    *
     public HashMap<String, String> getUserDetails() {
         HashMap<String, String> user = new HashMap<String, String>();
         String selectQuery = "SELECT * FROM " + TABLE_GEODATA;
@@ -184,33 +191,32 @@ public class SQLiteHandler extends SQLiteOpenHelper {
         Log.d(TAG, "Fetching user from Sqlite: " + user.toString());
 
         return user;
-    }
+    }*/
     /**
     * Getting user login status return true if rows are there in table
     * */
     public int getRowCount() {
-        String countQuery = "SELECT * FROM " + TABLE_GEODATA;
+        String countQuery = "SELECT * FROM " + TABLE_MARKERS;
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(countQuery, null);
         int rowCount = cursor.getCount();
         db.close();
         cursor.close();
-
         // return row count
         return rowCount;
     }
     /**
     * Re crate database Delete all tables and create them again
     * */
-        public void deleteUsers() {
+        public void deleteAll() {
         SQLiteDatabase db = this.getWritableDatabase();
         // Delete All Rows
-        db.delete(TABLE_GEODATA, null, null);
+        db.delete(TABLE_MARKERS, null, null);
         db.close();
 
         Log.d(TAG, "Deleted all user info from sqlite");
     }
-
+    /*
     public static void exportDB(Context ac) {
         File sd = Environment.getExternalStorageDirectory();
         File data = Environment.getDataDirectory();
@@ -255,4 +261,5 @@ public class SQLiteHandler extends SQLiteOpenHelper {
             e.printStackTrace();
         }
     }
+    */
 }

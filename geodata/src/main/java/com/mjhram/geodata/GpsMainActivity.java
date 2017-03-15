@@ -24,7 +24,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Build;
@@ -37,6 +41,9 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
+import android.text.Layout;
+import android.text.StaticLayout;
+import android.text.TextPaint;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -48,6 +55,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.aconcepcion.geofencemarkerbuilder.MarkerBuilderManagerV2;
@@ -77,7 +85,6 @@ import com.mjhram.geodata.common.Utilities;
 import com.mjhram.geodata.common.events.CommandEvents;
 import com.mjhram.geodata.common.events.ServiceEvents;
 import com.mjhram.geodata.common.slf4j.SessionLogcatAppender;
-import com.mjhram.geodata.helper.SQLiteHandler;
 import com.mjhram.geodata.helper.UploadClass;
 import com.mjhram.geodata.views.GenericViewFragment;
 
@@ -89,7 +96,9 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -122,8 +131,9 @@ public class GpsMainActivity extends GenericViewFragment
     //private CountDownTimer countDownTimer;
     //private TRequestObj selectedTRequest = null;
     private DrawerLayout mDrawerLayout;
-    public SQLiteHandler dbhandler;
+    //public SQLiteHandler dbhandler;
     private MarkerBuilderManagerV2 markerBuilderManager;
+    private TextView tvDateTime;
 
     public class btnOnClickListener implements View.OnClickListener {
         public void onClick(View v) {//start new trip when start or stop service
@@ -139,7 +149,8 @@ public class GpsMainActivity extends GenericViewFragment
                     EventBus.getDefault().postSticky(new CommandEvents.RequestStartStop(true));
                     btnAcceptedTask.setText(getString(R.string.BtnTextTurnOff));
                     driverState = 0;
-
+                    firstMarkerTime=-1;
+                    lastMarkerTime=-1;
                     break;
 
             }
@@ -160,7 +171,7 @@ public class GpsMainActivity extends GenericViewFragment
             UploadClass uc = new UploadClass(this);
             uc.checkLogin();
         }
-        dbhandler = new SQLiteHandler(this);
+        //dbhandler = new SQLiteHandler(this);
         //Utilities.ConfigureLogbackDirectly(getApplicationContext());
         tracer = LoggerFactory.getLogger(GpsMainActivity.class.getSimpleName());
 
@@ -168,10 +179,11 @@ public class GpsMainActivity extends GenericViewFragment
 
         setContentView(R.layout.activity_gps_main);
 
-        AppSettings.setTripId("-1");// new tripid
+        //AppSettings.setTripId("-1");// new tripid
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 
         btnAcceptedTask = (Button) findViewById(R.id.btnAcceptedTask);
+        tvDateTime = (TextView) findViewById(R.id.tvDateTime);
 
         btnAcceptedTask.setOnClickListener(new btnOnClickListener());
 
@@ -288,6 +300,7 @@ public class GpsMainActivity extends GenericViewFragment
         FragmentManager fm = getSupportFragmentManager();
         SupportMapFragment mapFragment =
                 (SupportMapFragment) fm.findFragmentById(R.id.location_map);
+        mapFragment.setRetainInstance(true);
         mapFragment.getMapAsync(this);
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
@@ -616,16 +629,18 @@ public class GpsMainActivity extends GenericViewFragment
     /**
      * Provides a connection to the GPS Logging Service
      */
+    GpsLoggingService loggingService;
     private final ServiceConnection gpsServiceConnection = new ServiceConnection() {
 
         public void onServiceDisconnected(ComponentName name) {
             tracer.debug("Disconnected from GPSLoggingService from MainActivity");
-            //loggingService = null;
+            loggingService = null;
         }
 
         public void onServiceConnected(ComponentName name, IBinder service) {
             tracer.debug("Connected to GPSLoggingService from MainActivity");
-            //loggingService = ((GpsLoggingService.GpsLoggingBinder) service).getService();
+            loggingService = ((GpsLoggingService.GpsLoggingBinder) service).getService();
+            updateLoc(null);
         }
     };
 
@@ -1021,8 +1036,9 @@ public class GpsMainActivity extends GenericViewFragment
         }
 
         //add info to the list
-        addNewLoc(new MyInfo(locationUpdate.location));
-        updateLoc();
+        //addNewLoc(new MyInfo(locationUpdate.location));
+        Log.d("updateLoc :",locationUpdate.location.toString());
+        updateLoc(locationUpdate.location);
     }
 
 
@@ -1183,30 +1199,74 @@ public class GpsMainActivity extends GenericViewFragment
         }
     }
 
-    public void updateLoc() {
+    long firstMarkerTime=-1, lastMarkerTime=-1;
+    public void updateLoc(Location aLoc){
+        if(loggingService == null) return;
+        if(aLoc == null){//add all locations
+            //add markers for new locations
+            int s = loggingService.newLocationsList.size();
+            if(s>0) {
+                firstMarkerTime = loggingService.newLocationsList.get(0).getTime();
+                lastMarkerTime = loggingService.newLocationsList.get(s - 1).getTime();
+            }
+            for(Location loc: loggingService.newLocationsList){
+                addLocationMarker(loc);
+            }
+        } else {
+            addLocationMarker(aLoc);
+            if(firstMarkerTime==-1) {
+                firstMarkerTime = aLoc.getTime();
+            }
+            lastMarkerTime = aLoc.getTime();
+        }
+    }
+
+    private void addLocationMarker(Location loc) {
+        LatLng driverPosition = new LatLng(loc.getLatitude(), loc.getLongitude());
+
+        BitmapDescriptor bmp;
+        float spd = loc.getSpeed();
+        if(loc.hasBearing()) {
+            if (spd < 1.0) {//3.6km/h
+                bmp = BitmapDescriptorFactory.fromResource(R.drawable.arrowup_red);
+            } else if (spd >= 1 && spd < 6) {//21km/h
+                bmp = BitmapDescriptorFactory.fromResource(R.drawable.arrowup_orange);
+            } else if (spd >= 6 && spd < 12) {//43km/h
+                bmp = BitmapDescriptorFactory.fromResource(R.drawable.arrowup_cyan);
+            } else //if(spd>=12 && spd<20)
+            {//72km/h
+                bmp = BitmapDescriptorFactory.fromResource(R.drawable.arrowup_green);
+            }
+        }else{
+            if (spd < 1.0) {//3.6km/h
+                bmp = BitmapDescriptorFactory.fromResource(R.drawable.circle_red);
+            } else if (spd >= 1 && spd < 6) {//21km/h
+                bmp = BitmapDescriptorFactory.fromResource(R.drawable.circle_orange);
+            } else if (spd >= 6 && spd < 12) {//43km/h
+                bmp = BitmapDescriptorFactory.fromResource(R.drawable.circle_cyan);
+            } else //if(spd>=12 && spd<20)
+            {//72km/h
+                bmp = BitmapDescriptorFactory.fromResource(R.drawable.circle_grn);
+            }
+        }
+        MarkerOptions markerOptions = new MarkerOptions()
+                .position(driverPosition)
+                .icon(bmp)
+                .title("")
+                //.snippet(driverInfo[i].phone)
+                //.anchor(0.5f, 0.5f)
+                //.draggable(true);
+                .rotation(Math.round(loc.getBearing()))
+                ;
+        Marker aMarker = googleMap.addMarker(markerOptions);
+        locationMarkers.add(aMarker);
+    }
+    /*public void updateLoc() {
         //add markers for new locations
         int newRecords = locationMarkers.size();
         while(newRecords < myinfoList.size()){
             MyInfo info = myinfoList.get(newRecords);
             LatLng driverPosition = new LatLng(info.loc.getLatitude(), info.loc.getLongitude());
-
-            /*fPoint arrowPts[] = {new fPoint(-.90,-1.0), new fPoint(-.55, 0.0),
-                    new fPoint(-.90, +1.0), new fPoint(+.90, 0.0)};
-            double angle = Math.toRadians(45);//info.loc.getBearing()
-            fPoint rotatedPts[] = new fPoint[4];
-            for(int k = 0; k < 4; k++) {
-                rotatedPts[k] = arrowPts[k].rotate(angle);
-            }
-            Polygon polygon = googleMap.addPolygon(new PolygonOptions()
-                    .add(new LatLng(info.loc.getLatitude()+rotatedPts[0].x, info.loc.getLongitude()+rotatedPts[0].y),
-                            new LatLng(info.loc.getLatitude()+rotatedPts[1].x, info.loc.getLongitude()+rotatedPts[1].y),
-                            new LatLng(info.loc.getLatitude()+rotatedPts[2].x, info.loc.getLongitude()+rotatedPts[2].y),
-                            new LatLng(info.loc.getLatitude()+rotatedPts[3].x, info.loc.getLongitude()+rotatedPts[3].y))
-                    .strokeColor(Color.RED)
-                    .strokeWidth(1f)
-                    .fillColor(Color.BLUE));
-            locationMarkers.add(polygon);*/
-
 
             BitmapDescriptor bmp;
             float spd = info.loc.getSpeed();
@@ -1248,18 +1308,6 @@ public class GpsMainActivity extends GenericViewFragment
         }
 
         //check and remove old info
-        /*long now = System.currentTimeMillis();
-        for(int k=0; k<myinfoList.size(); k++) {
-            MyInfo aInfo = myinfoList.get(k);
-            if(aInfo.loc.getTime() < now - 1*3600*1000) { //1hour before now
-                myinfoList.remove(k);
-                locationMarkers.get(k).remove();
-                locationMarkers.remove(k);
-                Log.v("geo_tag","location removed");
-            } else {
-                break;
-            }
-        }*/
 
     }
 
@@ -1267,7 +1315,7 @@ public class GpsMainActivity extends GenericViewFragment
         //add new location info
         myinfoList.add(info);
         Log.v("geo_tag","location added");
-    }
+    }*/
 
     /*public void clearMarkers() {
         myinfoList.clear();
@@ -1284,7 +1332,7 @@ public class GpsMainActivity extends GenericViewFragment
         UploadClass uc = new UploadClass(GpsMainActivity.this);
         long i = 0, step = 100;
         uc.getServerData(i, step, dbhandler);
-    }*/
+    }
 
     public void onExportClicked(View v) {
         SQLiteHandler.exportDB(this);
@@ -1301,7 +1349,7 @@ public class GpsMainActivity extends GenericViewFragment
         hideDialog();
     }
 
-    /*public void onShotClicked(View v) {
+    public void onShotClicked(View v) {
         captureScreen();
     }
 
@@ -1359,15 +1407,77 @@ public class GpsMainActivity extends GenericViewFragment
         }
     }*/
 
+    public Bitmap drawMultilineTextToBitmap(Context gContext, Bitmap bitmap, String gText) {
+        // prepare canvas
+        Resources resources = gContext.getResources();
+        float scale = resources.getDisplayMetrics().density;
+        //Bitmap bitmap = BitmapFactory.decodeResource(resources, gResId);
+
+        android.graphics.Bitmap.Config bitmapConfig = bitmap.getConfig();
+        // set default bitmap config if none
+        if(bitmapConfig == null) {
+            bitmapConfig = android.graphics.Bitmap.Config.ARGB_8888;
+        }
+        // resource bitmaps are imutable,
+        // so we need to convert it to mutable one
+        bitmap = bitmap.copy(bitmapConfig, true);
+
+        Canvas canvas = new Canvas(bitmap);
+
+        // new antialiased Paint
+        TextPaint paint=new TextPaint(Paint.ANTI_ALIAS_FLAG);
+        // text color - #3D3D3D
+        paint.setColor(Color.rgb(61, 61, 61));
+        // text size in pixels
+        paint.setTextSize((int) (20 * scale));
+        // text shadow
+        paint.setShadowLayer(1f, 0f, 1f, Color.WHITE);
+        //canvas.drawText("This is", 100, 100, paint);
+        //canvas.drawText("multi-line", 100, 150, paint);
+        //canvas.drawText("text", 100, 200, paint);
+
+        // set text width to canvas width minus 16dp padding
+        int textWidth = canvas.getWidth() - (int) (16 * scale);
+
+        // init StaticLayout for text
+        StaticLayout textLayout = new StaticLayout(
+                gText, paint, textWidth, Layout.Alignment.ALIGN_CENTER, 1.0f, 0.0f, false);
+
+        // get height of multiline text
+        int textHeight = textLayout.getHeight();
+
+        // get position of text's top left corner
+        float x = (bitmap.getWidth() - textWidth)/2;
+        float y = bitmap.getHeight() - textHeight;
+
+        // draw text to the Canvas center
+        canvas.save();
+        canvas.translate(x, y);
+        textLayout.draw(canvas);
+        canvas.restore();
+
+        return bitmap;
+    }
+
     public void captureAndShareGMap()
     {
         GoogleMap.SnapshotReadyCallback callback = new GoogleMap.SnapshotReadyCallback()
         {
-
             @Override
-            public void onSnapshotReady(Bitmap snapshot)
+            public void onSnapshotReady(Bitmap snapshot1)
             {
                 // TODO Auto-generated method stub
+                SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTimeInMillis(lastMarkerTime);
+                String eTime = sdf.format(calendar.getTime());
+                calendar.setTimeInMillis(firstMarkerTime);
+                String fTime = sdf.format(calendar.getTime());
+                sdf.applyPattern("dd MMM,yyyy");
+                String fDate = sdf.format(calendar.getTime());
+                String dateString = fDate+" "+fTime+"-"+eTime;
+
+                Bitmap snapshot = drawMultilineTextToBitmap(GpsMainActivity.this, snapshot1, dateString);
                 //bitmap = snapshot;
                 String filePath = System.currentTimeMillis() + ".jpeg";
                 filePath = Environment.getExternalStorageDirectory().toString() + "/" + filePath;

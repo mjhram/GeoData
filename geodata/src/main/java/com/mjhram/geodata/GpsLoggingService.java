@@ -52,6 +52,7 @@ import com.mjhram.geodata.common.Utilities;
 import com.mjhram.geodata.common.events.CommandEvents;
 import com.mjhram.geodata.common.events.ServiceEvents;
 import com.mjhram.geodata.common.slf4j.SessionLogcatAppender;
+import com.mjhram.geodata.helper.SQLiteHandler;
 import com.mjhram.geodata.helper.UploadClass;
 
 import org.slf4j.LoggerFactory;
@@ -59,6 +60,7 @@ import org.slf4j.LoggerFactory;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 import de.greenrobot.event.EventBus;
@@ -69,6 +71,8 @@ public class GpsLoggingService extends Service  {
     private final IBinder binder = new GpsLoggingBinder();
     AlarmManager nextPointAlarmManager;
     private NotificationCompat.Builder nfc = null;
+    public ArrayList<Location> newLocationsList;
+    static public final int maxTripLocations = 200;
 
     private org.slf4j.Logger tracer;
 
@@ -89,6 +93,7 @@ public class GpsLoggingService extends Service  {
     PendingIntent activityRecognitionPendingIntent;
     GoogleApiClient googleApiClient;
     private Location prevLocation;
+    SQLiteHandler dbhandler = new SQLiteHandler(this);
     // ---------------------------------------------------
 
 
@@ -99,6 +104,7 @@ public class GpsLoggingService extends Service  {
 
     @Override
     public void onCreate() {
+        newLocationsList = new ArrayList<>();
         //Utilities.ConfigureLogbackDirectly(getApplicationContext());
         tracer = LoggerFactory.getLogger(GpsLoggingService.class.getSimpleName());
 
@@ -180,6 +186,10 @@ public class GpsLoggingService extends Service  {
         tracer.warn(SessionLogcatAppender.MARKER_INTERNAL, "GpsLoggingService is being destroyed by Android OS.");
         UnregisterEventBus();
         RemoveNotification();
+
+        newLocationsList.clear();
+        newLocationsList = null;
+
         super.onDestroy();
     }
 
@@ -885,7 +895,14 @@ public class GpsLoggingService extends Service  {
             tracer.debug("Logging passive location to file");
         }
 
-        WriteToFile(new MyInfo(loc));
+        Location avLocation = UploadClass.getFinalLocation(loc);
+        WriteToFile(new MyInfo(avLocation));
+        int s = newLocationsList.size();
+        if(s >= maxTripLocations) {
+            newLocationsList.remove(s-1);
+        }
+        newLocationsList.add(avLocation);
+        //dbhandler.addData(UploadClass.getFinalLocation(loc));
         //EventBus.getDefault().post(new ServiceEvents.LocationUpdate(loc));
 
         //ResetAutoSendTimersIfNecessary();

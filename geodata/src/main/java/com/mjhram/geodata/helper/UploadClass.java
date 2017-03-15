@@ -39,7 +39,6 @@ public class UploadClass {
 
     private static final String TAG = UploadClass.class.getSimpleName();
     private phpErrorMessages phpErrorMsgs;
-    public static ArrayList<Location> locationsBuffer=null;
 
     public UploadClass(Context theCx) {
         phpErrorMsgs = AppSettings.getInstance().getPhpErrorMsg();
@@ -729,6 +728,7 @@ public class UploadClass {
 
     }
     */
+    public static ArrayList<Location> locationsBuffer=null;
     private static final int locationExpiryTime = 30000;//30 sec
     private static final int maxLocBuffer = 10;
     static public void addLoc2buffer(Location loc){
@@ -748,8 +748,8 @@ public class UploadClass {
         locationsBuffer.add(loc);
     }
 
-    private static Location getFinalLocation(Location lastLoc){
-        Location loc = lastLoc;
+    public static Location getFinalLocation(Location lastLoc){
+        Location loc = new Location(lastLoc);
         //do averaging or clustering:
         int bufSize = locationsBuffer.size();
         float initialBearing=0, initialSpeed=0, initialAccuracy=0;
@@ -794,7 +794,6 @@ public class UploadClass {
         final boolean avState = info.updateStateOnly;
         System.out.print(avState);
 
-        info.loc = getFinalLocation(info.loc);
         EventBus.getDefault().post(new ServiceEvents.LocationUpdate(info.loc));
 
         StringRequest strReq = new StringRequest(Request.Method.POST,
