@@ -1,0 +1,8 @@
+This app collects location related info (such as but not limited to speed, direction, and accuracy). These data can be shared with other users without any indication to the user or device that were collected from. 
+The app uses Firebase Cloud Notifications. The privacy policy can be found at: https://www.google.com/policies/privacy/
+The app is using crashlytics for crash reporting. Crashlytics privacy policy is: http://try.crashlytics.com/terms/
+
+Changes to the Privacy Policy:
+We reserve the right to change this policy at any time, so please re-visit this page frequently. Changes to this privacy policy are effective as of the stated "Last Update" and your continued use of the app on or after the Last Update date will constitute acceptance of, and agreement to be bound by, those changes.
+Last Update: Mar 2017
+

@@ -20,4 +20,20 @@
         android:textAlignment="center"
         android:gravity="center_horizontal"
         android:textSize="22dp" />
+    <TextView
+        android:text="Privacy Policy"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/textView"
+        android:paddingBottom="0dp"
+        android:paddingTop="20dp"
+        android:textColor="#ff000000"
+        android:textSize="20dp"/>
+    <TextView
+        android:text="http://geo.ajerlitaxi.com/privacy%20policy-geodata.txt"
+        android:id="@+id/TextView1"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:autoLink="web">
+    </TextView>
 </LinearLayout>
