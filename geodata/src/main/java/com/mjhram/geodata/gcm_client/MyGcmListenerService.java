@@ -30,7 +30,6 @@ import com.google.firebase.messaging.RemoteMessage;
 import com.mjhram.geodata.GpsMainActivity;
 import com.mjhram.geodata.R;
 import com.mjhram.geodata.common.AppSettings;
-import com.mjhram.geodata.common.Utilities;
 
 import java.util.Map;
 
@@ -38,6 +37,10 @@ public class MyGcmListenerService extends FirebaseMessagingService {
 
     private static final String TAG = "MyGcmListenerService";
 
+    @Override
+    public void onDeletedMessages() {
+        Log.d(TAG, "There are Msgs del's from FCM");
+    }
     @Override
     public void onMessageReceived(RemoteMessage rMessage) {
         String from = rMessage.getFrom();
@@ -51,15 +54,10 @@ public class MyGcmListenerService extends FirebaseMessagingService {
         }
         if(message !=null){
             Log.d(TAG, "Message: " + message);
-            //JSONObject jObj = new JSONObject(message);
-            //int reqId = Integer.parseInt(message);//jObj.getInt("message");//
-
-            //AppSettings.setRefreshTReqList(true, reqId);
-            //EventBus.getDefault().post(new ServiceEvents.RefreshTRequests(reqId));
-            //sendNotification(Integer.toString(reqId));
             if(AppSettings.getNotificationPref()) {
-                if(Utilities.isNumeric(message)) {
-                    sendNotification(getString(R.string.gcmClientNewReq));
+                //if(Utilities.isNumeric(message))
+                {
+                    sendNotification(message);
                 }
             }
         }
@@ -78,7 +76,7 @@ public class MyGcmListenerService extends FirebaseMessagingService {
 
         Uri defaultSoundUri= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
-                .setSmallIcon(R.drawable.ic_passanger)
+                .setSmallIcon(R.mipmap.ic_launcher)
                 .setContentTitle(getString(R.string.gcmClientGcmMsg))
                 .setContentText(message)
                 .setAutoCancel(true)

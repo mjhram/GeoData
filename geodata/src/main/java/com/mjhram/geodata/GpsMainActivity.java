@@ -55,10 +55,8 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.aconcepcion.geofencemarkerbuilder.MarkerBuilderManagerV2;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
@@ -132,8 +130,7 @@ public class GpsMainActivity extends GenericViewFragment
     //private TRequestObj selectedTRequest = null;
     private DrawerLayout mDrawerLayout;
     //public SQLiteHandler dbhandler;
-    private MarkerBuilderManagerV2 markerBuilderManager;
-    private TextView tvDateTime;
+    //private MarkerBuilderManagerV2 markerBuilderManager;
 
     public class btnOnClickListener implements View.OnClickListener {
         public void onClick(View v) {//start new trip when start or stop service
@@ -183,7 +180,6 @@ public class GpsMainActivity extends GenericViewFragment
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 
         btnAcceptedTask = (Button) findViewById(R.id.btnAcceptedTask);
-        tvDateTime = (TextView) findViewById(R.id.tvDateTime);
 
         btnAcceptedTask.setOnClickListener(new btnOnClickListener());
 
@@ -202,10 +198,12 @@ public class GpsMainActivity extends GenericViewFragment
             EventBus.getDefault().postSticky(new CommandEvents.RequestStartStop(true));
         }
         String regId = AppSettings.getRegId();
-        if(regId == null || regId.isEmpty()) {
-            String token = FirebaseInstanceId.getInstance().getToken();
+        String token = FirebaseInstanceId.getInstance().getToken();
+
+        if(regId == null || regId.isEmpty() || !regId.equals(token)) {
             AppSettings.setRegId(token);
             regId = token;
+            AppSettings.shouldUploadRegId = true;
         }
         if(AppSettings.shouldUploadRegId && regId != null) {
             AppSettings.shouldUploadRegId = false;
@@ -214,59 +212,12 @@ public class GpsMainActivity extends GenericViewFragment
         }
     }
 
-    /*DrawerLayout.DrawerListener myDrawerListener = new DrawerLayout.DrawerListener() {
-        @Override
-        public void onDrawerClosed(View drawerView) {
-            Toast.makeText(getApplicationContext(), "Drawer Closed", Toast.LENGTH_LONG).show();
-        }
-
-        @Override
-        public void onDrawerOpened(View drawerView) {
-            Toast.makeText(getApplicationContext(), "Drawer Opened", Toast.LENGTH_LONG).show();
-        }
-
-        @Override
-        public void onDrawerSlide(View drawerView, float slideOffset) {
-            Toast.makeText(getApplicationContext(), "Drawer Slide:"+slideOffset, Toast.LENGTH_LONG).show();
-        }
-
-        @Override
-        public void onDrawerStateChanged(int newState) {
-            String state;
-            switch(newState){
-                case DrawerLayout.STATE_IDLE:
-                    state = "STATE_IDLE";
-                    break;
-                case DrawerLayout.STATE_DRAGGING:
-                    state = "STATE_DRAGGING";
-                    break;
-                case DrawerLayout.STATE_SETTLING:
-                    state = "STATE_SETTLING";
-                    break;
-                default:
-                    state = "unknown!";
-            }
-            Toast.makeText(getApplicationContext(), "Drawer Changed:"+state, Toast.LENGTH_LONG).show();
-        }
-    };*/
-
-    private void setUpMap(GoogleMap mMap) {
-        markerBuilderManager = new MarkerBuilderManagerV2.Builder(this)
-                .map(mMap)
-                .enabled(true)
-                .radius(1000)
-                .minRadius(200)
-                .maxRadius(5000)
-                .fillColor(0x500000ff)
-                .build();
-    }
-
     @Override
     public void onMapReady(GoogleMap map) {
         map.setMyLocationEnabled(true);
         //map.setOnMyLocationButtonClickListener(this);
         googleMap = map;
-        setUpMap(googleMap);
+        //setUpMap(googleMap);
 
     }
 
@@ -307,17 +258,6 @@ public class GpsMainActivity extends GenericViewFragment
                 .addApi(LocationServices.API)
                 .build();
     }
-    /*private void RegisterEventBus() {
-        EventBus.getDefault().register(this);
-    }
-
-    private void UnregisterEventBus(){
-        try {
-        EventBus.getDefault().unregister(this);
-        } catch (Throwable t){
-            //this may crash if registration did not go through. just be safe
-        }
-    }*/
 
     @Override
     protected void onStart() {
@@ -404,18 +344,6 @@ public class GpsMainActivity extends GenericViewFragment
         return super.onKeyDown(keyCode, event);
     }
 
-    /*private void WriteToFile(MyInfo info) {
-        Session.setAddNewTrackSegment(false);
-        try {
-            tracer.debug("Calling file writers");
-            //FileLoggerFactory.Write(getApplicationContext(), info);
-            UploadClass.updateLoc(info);
-        }
-        catch(Exception e){
-            tracer.error(getString(R.string.could_not_write_to_file), e);
-        }
-    }*/
-
     private void loadPresetProperties() {
 
         //Either look for /<appfolder>/geodata.properties or /sdcard/geodata.properties
@@ -466,12 +394,6 @@ public class GpsMainActivity extends GenericViewFragment
             setSupportActionBar(toolbar);
             getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-            //Deprecated in Lollipop but required if targeting 4.x
-            //SpinnerAdapter spinnerAdapter = ArrayAdapter.createFromResource(getApplicationContext(), R.array.gps_main_views, R.layout.spinner_dropdown_item);
-            //getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
-            //getSupportActionBar().setListNavigationCallbacks(spinnerAdapter, this);
-            //getSupportActionBar().setSelectedNavigationItem(GetUserSelectedNavigationItem());
-
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 Window window = getWindow();
                 window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
@@ -502,12 +424,6 @@ public class GpsMainActivity extends GenericViewFragment
 
             public void onDrawerOpened(View drawerView) {
                 invalidateOptionsMenu();
-                /*if(drawerView.equals(relativeLayout_rightDrawer)) {
-                    UploadClass uploadClass = new UploadClass(GpsMainActivity.this);
-                    uploadClass.updateRequests(-1, GpsMainActivity.this);
-                    //to make sure the log service is started
-                    EventBus.getDefault().postSticky(new CommandEvents.RequestStartStop(true));
-                }*/
             }
         };
 
@@ -543,11 +459,6 @@ public class GpsMainActivity extends GenericViewFragment
                 .setTextPrimary(getString(R.string.menu_about)));
 
         drawer.addDivider();
-
-        /*drawer.addItem(new DrawerItem()
-                .setId(14)//logout
-                .setImage(ContextCompat.getDrawable(this, R.drawable.logout))
-                .setTextPrimary(getString(R.string.menu_logout)));*/
 
         drawer.addItem(new DrawerItem()
                         .setId(12)//exit
@@ -597,24 +508,7 @@ public class GpsMainActivity extends GenericViewFragment
                 startActivity(faqtivity);
             }
         });
-
-        /*rightDrawerButton = (ImageButton) findViewById(R.id.imgRightDrawer);
-        rightDrawerButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                drawerLayout.openDrawer(Gravity.RIGHT);
-            }
-        });*/
-
     }
-
-    /*private void logout() {
-        EventBus.getDefault().post(new CommandEvents.RequestStartStop(false));
-        AppSettings.logout();
-        Intent loginActivity = new Intent(getApplicationContext(), LoginActivity.class);
-        startActivity(loginActivity);
-        finish();
-    }*/
 
     public void ToggleDrawer(){
         DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -690,125 +584,7 @@ public class GpsMainActivity extends GenericViewFragment
         tracer.debug(inProgress + "");
     }
 
-    /*@EventBusHook
-    public void onEventMainThread(ServiceEvents.forceLogout tmp){
-        logout();
-    }
 
-    @EventBusHook
-    public void onEventMainThread(UploadEvents.OpenGTS upload){
-        tracer.debug("Open GTS Event completed, success: " + upload.success);
-        Utilities.HideProgress();
-
-        if(!upload.success){
-            tracer.error(getString(R.string.opengts_setup_title)
-                    + "-"
-                    + getString(R.string.upload_failure));
-
-            if(userInvokedUpload){
-                Utilities.MsgBox(getString(R.string.sorry),getString(R.string.upload_failure), this);
-                userInvokedUpload = false;
-            }
-        }
-    }
-
-    @EventBusHook
-    public void onEventMainThread(UploadEvents.AutoEmail upload){
-        tracer.debug("Auto Email Event completed, success: " + upload.success);
-        Utilities.HideProgress();
-
-        if(!upload.success){
-            tracer.error(getString(R.string.autoemail_title)
-                    + "-"
-                    + getString(R.string.upload_failure));
-            if(userInvokedUpload){
-                Utilities.MsgBox(getString(R.string.sorry),getString(R.string.upload_failure), this);
-                userInvokedUpload = false;
-            }
-        }
-    }
-
-    @EventBusHook
-    public void onEventMainThread(UploadEvents.OpenStreetMap upload){
-        tracer.debug("OSM Event completed, success: " + upload.success);
-        Utilities.HideProgress();
-
-        if(!upload.success){
-            tracer.error(getString(R.string.osm_setup_title)
-                    + "-"
-                    + getString(R.string.upload_failure));
-            if(userInvokedUpload){
-                Utilities.MsgBox(getString(R.string.sorry),getString(R.string.upload_failure), this);
-                userInvokedUpload = false;
-            }
-        }
-    }
-
-    @EventBusHook
-    public void onEventMainThread(UploadEvents.Dropbox upload){
-        tracer.debug("Dropbox Event completed, success: " + upload.success);
-        Utilities.HideProgress();
-
-        if(!upload.success){
-            tracer.error(getString(R.string.dropbox_setup_title)
-                    + "-"
-                    + getString(R.string.upload_failure));
-            if(userInvokedUpload){
-                Utilities.MsgBox(getString(R.string.sorry),getString(R.string.upload_failure), this);
-                userInvokedUpload = false;
-            }
-        }
-    }
-
-    @EventBusHook
-    public void onEventMainThread(UploadEvents.GDocs upload){
-        tracer.debug("GDocs Event completed, success: " + upload.success);
-        Utilities.HideProgress();
-
-        if(!upload.success){
-            tracer.error(getString(R.string.gdocs_setup_title)
-                    + "-"
-                    + getString(R.string.upload_failure));
-            if(userInvokedUpload){
-                Utilities.MsgBox(getString(R.string.sorry),getString(R.string.upload_failure), this);
-                userInvokedUpload = false;
-            }
-        }
-    }
-
-    @EventBusHook
-    public void onEventMainThread(UploadEvents.Ftp upload){
-        tracer.debug("FTP Event completed, success: " + upload.success);
-        Utilities.HideProgress();
-
-        if(!upload.success){
-            tracer.error(getString(R.string.autoftp_setup_title)
-                    + "-"
-                    + getString(R.string.upload_failure));
-            if(userInvokedUpload){
-                Utilities.MsgBox(getString(R.string.sorry),getString(R.string.upload_failure), this);
-                userInvokedUpload = false;
-            }
-        }
-    }
-
-
-    @EventBusHook
-    public void onEventMainThread(UploadEvents.OwnCloud upload){
-        tracer.debug("OwnCloud Event completed, success: " + upload.success);
-        Utilities.HideProgress();
-
-        if(!upload.success){
-            tracer.error(getString(R.string.owncloud_setup_title)
-                    + "-"
-                    + getString(R.string.upload_failure));
-
-            if(userInvokedUpload){
-                Utilities.MsgBox(getString(R.string.sorry),getString(R.string.upload_failure), this);
-                userInvokedUpload = false;
-            }
-        }
-    }*/
 
     @Override
     public void onLocationChanged(Location location) {
@@ -821,210 +597,6 @@ public class GpsMainActivity extends GenericViewFragment
         }
     }
 
-
-    /*
-    void setStateToIdle() {
-        driverState =0;
-        //UploadClass uploadClass = new UploadClass(GpsMainActivity.this);
-        //uploadClass.updateRequests(-1, this);
-        btnAcceptedTask.setVisibility(View.INVISIBLE);
-        relativeLayout_passenger.setVisibility(View.INVISIBLE);
-        //btnAccept.setVisibility(View.VISIBLE);//show all task list
-        mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, Gravity.RIGHT);
-        rightDrawerButton.setEnabled(true);
-
-        reqListView.setVisibility(View.VISIBLE);
-        //btnPassangers.setVisibility(View.VISIBLE);
-
-        if(fromMarker != null) {
-            fromMarker.remove();
-            fromMarker = null;
-        }
-        if(toMarker != null) {
-            toMarker.remove();
-            fromMarker = null;
-        }
-        Session.availabilityState = 0;
-    }
-
-    void setStateTo(TRequestObj tRequestObj) {
-        selectedTRequest = tRequestObj;
-        reqListView.setVisibility(View.INVISIBLE);
-        //btnPassangers.setVisibility(View.INVISIBLE);
-        //1. driver not assigned yet => neglect it
-        if(tRequestObj.status.equalsIgnoreCase("assigned")) {
-            btnAcceptedTask.setText(getString(R.string.gpsMainBtnPickedUp));
-            //btnAccept.setVisibility(View.INVISIBLE);//hide all tasks list
-            mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, Gravity.RIGHT);
-            rightDrawerButton.setEnabled(false);
-
-            driverState = 1;
-            //onNavigationItemSelected(1, 0);//busy
-            //Session.availabilityState = 1;
-            EventBus.getDefault().postSticky(new CommandEvents.RequestStartStop(true)); // just to update notification state
-        } else {
-            //picked up
-            btnAcceptedTask.setText(getString(R.string.gpsMainBtnDone));
-            //btnAccept.setVisibility(View.INVISIBLE);//hide all tasks list
-            mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, Gravity.RIGHT);
-            rightDrawerButton.setEnabled(false);
-
-            driverState = 2;
-        }
-        Session.availabilityState = 1;
-        btnAcceptedTask.setVisibility(View.VISIBLE);
-        relativeLayout_passenger.setVisibility(View.VISIBLE);
-        textViewPassengerName.setText(selectedTRequest.passangerName);
-        textViewPassengerInfo.setText(getString(R.string.uploadDriverInfo) + selectedTRequest.passengerInfo);
-        btnPassengerPhone.setText(selectedTRequest.passengerPhone);
-        {
-            //final String IMAGE_URL = "http://developer.android.com/images/training/system-ui.png";
-            ImageLoader mImageLoader = AppSettings.getInstance().getImageLoader();
-            networkImageViewPassenger.setImageUrl(tRequestObj.passengerPhotoUrl, mImageLoader);
-        }
-        //2. driver assigned or passanger picked
-        LatLng currentPosition = new LatLng(tRequestObj.fromLat, tRequestObj.fromLong);
-        if(fromMarker == null) {
-            MarkerOptions markerOptions = new MarkerOptions()
-                    .position(currentPosition)
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
-                    .draggable(true);
-            ;
-            fromMarker = googleMap.addMarker(markerOptions);
-        } else {
-            fromMarker.setPosition(currentPosition);
-        }
-
-        currentPosition = new LatLng(tRequestObj.toLat, tRequestObj.toLong);
-        if (toMarker == null) {
-            MarkerOptions markerOptions = new MarkerOptions()
-                    .position(currentPosition)
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
-                    .draggable(false);
-            toMarker = googleMap.addMarker(markerOptions);
-        } else {
-            toMarker.setPosition(currentPosition);
-        }
-        LatLngBounds.Builder builder = new LatLngBounds.Builder();
-        {
-            builder.include(fromMarker.getPosition());
-            builder.include(toMarker.getPosition());
-        }
-        LatLngBounds bounds = builder.build();
-        int padding = 120; // offset from edges of the map in pixels
-        CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
-        googleMap.animateCamera(cu);
-    }
-
-    @EventBusHook
-    public void onEventMainThread(ServiceEvents.UpdateAnnouncement updateAnnEvent){
-        String ver = updateAnnEvent.ver;
-        String imageName = updateAnnEvent.annImage;
-        String tmpText = updateAnnEvent.annText;
-        String countDrv = updateAnnEvent.countOfDrivers;
-        String countPas = updateAnnEvent.countOfPassengers;
-
-        if(imageName.isEmpty() && tmpText.isEmpty() && countDrv.isEmpty() && countPas.isEmpty()) {
-            relativeLayoutAds.setVisibility(View.GONE);
-        } else {
-            if(imageName.isEmpty()) {
-                networkivAds.setVisibility(View.INVISIBLE);
-            } else {
-                //networkivAds = (NetworkImageView) findViewById(R.id.networkivAds);
-                networkivAds.setVisibility(View.VISIBLE);
-                {
-                    //final String IMAGE_URL = "http://developer.android.com/images/training/system-ui.png";
-                    ImageLoader mImageLoader = AppSettings.getInstance().getImageLoader();
-                    String tmp = Constants.URL_ads + imageName;
-                    networkivAds.setImageUrl(tmp, mImageLoader);
-                }
-            }
-            if(tmpText.isEmpty() && countDrv.isEmpty() && countPas.isEmpty()) {
-                textviewAds.setVisibility(View.GONE);
-            } else {
-                String s =  tmpText.replaceAll("\\\\n", "\\\n");
-                String tmp="";
-                if(!(countDrv.isEmpty() && countPas.isEmpty()))  {
-                    //tmp = String.format("%s:%s - %s:%s",getResources().getString(R.string.Drivers), countDrv, getResources().getString(R.string.Passengers), countPas);
-                    //s += "\n" + tmp;
-                    //s += "<br>" + tmp;
-                    s="<html>" + s + "</html>";
-                    textviewAds.setText(Html.fromHtml(s));
-                    textviewAds.setMovementMethod(LinkMovementMethod.getInstance());
-                    //Linkify.addLinks(textviewAds,Linkify.ALL);
-                }
-            }
-        }
-        //check for version:
-        if(ver.equalsIgnoreCase(Constants.ver) == false) {
-            // request for update => exit app
-            new MaterialDialog.Builder(this)
-                    .cancelable(false)
-                    .autoDismiss(false)
-                    .title(R.string.loginUpdateAppTitle)
-                    .content(getString(R.string.loginUpdateApp))
-                    .positiveText(R.string.ok)
-                    .callback(new MaterialDialog.ButtonCallback() {
-                        @Override
-                        public void onPositive(MaterialDialog dialog) {
-                            dialog.dismiss();
-                            EventBus.getDefault().post(new CommandEvents.RequestStartStop(false));
-
-                            String url = "market://details?id=" + getPackageName();//getString(R.string.appGoogleLink);
-                            if(AppSettings.getChosenLanguage() == "ar") {
-                                url += "&hl=ar";
-                            }
-                            Intent i = new Intent(Intent.ACTION_VIEW);
-                            i.setData(Uri.parse(url));
-                            startActivity(i);
-
-                            finish();
-                            return;
-                        }
-                    })
-                    .show();
-            //finish();
-        }
-    }
-    */
-
-    @EventBusHook
-    public void onEventMainThread(ServiceEvents.ErrorConnectionEvent erroConnectionEvent){
-        tracer.debug("error getting state");
-        btnAcceptedTask.setText(getResources().getString(R.string.gpsMainBtnReconnect));
-        //btnAcceptedTask.setVisibility(View.VISIBLE);
-        //relativeLayout_passenger.setVisibility(View.INVISIBLE);
-        //mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, Gravity.RIGHT);
-        //rightDrawerButton.setEnabled(false);
-        //driverState = 20;
-    }
-
-    /*@EventBusHook
-    public void onEventMainThread(ServiceEvents.GetDriverStateEvent getDrvStateEvent){
-        UploadClass uc = new UploadClass(GpsMainActivity.this);
-        uc.getDriverState(AppSettings.getUid());
-    }
-
-    @EventBusHook
-    public void onEventMainThread(ServiceEvents.UpdateDriverStateEvent updateStateEvent){
-        TRequestObj tRequestObj = updateStateEvent.treqObj;
-        if(tRequestObj == null) {
-            //idle:
-            setStateToIdle();
-        } else {
-            setStateTo(tRequestObj);
-        }
-
-    }
-
-    @EventBusHook
-    public void onEventMainThread(ServiceEvents.RefreshTRequests refreshTRequests){
-        //if(AppSettings.firstZooming) {
-            int treqid = refreshTRequests.tReqId;
-            UploadClass uploadClass = new UploadClass(GpsMainActivity.this);
-            uploadClass.updateRequests(-1, this);
-        //}
-    }*/
     @EventBusHook
     public void onEventMainThread(ServiceEvents.LocationUpdate locationUpdate){
         //DisplayLocationInfo(locationUpdate.location);
@@ -1042,26 +614,10 @@ public class GpsMainActivity extends GenericViewFragment
     }
 
 
-
-    /*@EventBusHook
-    public void onEventMainThread(ServiceEvents.FileNamed fileNamed){
-        //showCurrentFileName(fileNamed.newFileName);
-    }*/
-
     @EventBusHook
     public void onEventMainThread(ServiceEvents.WaitingForLocation waitingForLocation){
         OnWaitingForLocation(waitingForLocation.waiting);
     }
-
-    /*@EventBusHook
-    public void onEventMainThread(ServiceEvents.AnnotationStatus annotationStatus){
-        if(annotationStatus.annotationWritten){
-            //SetAnnotationDone();
-        }
-        else {
-            //SetAnnotationReady();
-        }
-    }*/
 
     @EventBusHook
     public void onEventMainThread(ServiceEvents.LoggingStatus loggingStatus){
@@ -1075,85 +631,6 @@ public class GpsMainActivity extends GenericViewFragment
         //enableDisableMenuItems();
     }
 
-    /*private void setActionButtonStart(){
-        actionButton.setText(R.string.btn_start_logging);
-        actionButton.setBackgroundColor(getResources().getColor(R.color.accentColor));
-        actionButton.setAlpha(0.8f);
-    }
-
-    private void setActionButtonStop(){
-        actionButton.setText(R.string.btn_stop_logging);
-        actionButton.setBackgroundColor(getResources().getColor(R.color.accentColorComplementary));
-        actionButton.setAlpha(0.8f);
-    }*/
-
-    /*private void showPreferencesSummary() {
-        //showCurrentFileName(Session.getCurrentFileName());
-
-        ImageView imgGpx = (ImageView) findViewById(R.id.simpleview_imgGpx);
-        ImageView imgKml = (ImageView) findViewById(R.id.simpleview_imgKml);
-        ImageView imgCsv = (ImageView) findViewById(R.id.simpleview_imgCsv);
-        ImageView imgNmea = (ImageView) findViewById(R.id.simpleview_imgNmea);
-        ImageView imgLink = (ImageView) findViewById(R.id.simpleview_imgLink);
-
-        if (AppSettings.shouldLogToGpx()) {
-
-            imgGpx.setVisibility(View.VISIBLE);
-        } else {
-            imgGpx.setVisibility(View.GONE);
-        }
-
-        if (AppSettings.shouldLogToKml()) {
-
-            imgKml.setVisibility(View.VISIBLE);
-        } else {
-            imgKml.setVisibility(View.GONE);
-        }
-
-        if (AppSettings.shouldLogToNmea()) {
-            imgNmea.setVisibility(View.VISIBLE);
-        } else {
-            imgNmea.setVisibility(View.GONE);
-        }
-
-        if (AppSettings.shouldLogToPlainText()) {
-
-            imgCsv.setVisibility(View.VISIBLE);
-        } else {
-            imgCsv.setVisibility(View.GONE);
-        }
-
-        if (AppSettings.shouldLogToCustomUrl()) {
-            imgLink.setVisibility(View.VISIBLE);
-        } else {
-            imgLink.setVisibility(View.GONE);
-        }
-
-        if (!AppSettings.shouldLogToGpx() && !AppSettings.shouldLogToKml()
-                && !AppSettings.shouldLogToPlainText()) {
-            showCurrentFileName(null);
-        }
-
-    }
-
-    private void showCurrentFileName(String newFileName) {
-        TextView txtFilename = (TextView) findViewById(R.id.simpleview_txtfilepath);
-        if (newFileName == null || newFileName.length() <= 0) {
-            txtFilename.setText("");
-            txtFilename.setVisibility(View.INVISIBLE);
-            return;
-        }
-
-        txtFilename.setVisibility(View.VISIBLE);
-        txtFilename.setText(Html.fromHtml("<em>" + AppSettings.getGpsLoggerFolder() + "/<strong><br />" + Session.getCurrentFileName() + "</strong></em>"));
-
-        Utilities.SetFileExplorerLink(txtFilename,
-                Html.fromHtml("<em><font color='blue'><u>" + AppSettings.getGpsLoggerFolder() + "</u></font>" + "/<strong><br />" + Session.getCurrentFileName() + "</strong></em>" ),
-                AppSettings.getGpsLoggerFolder(),
-                this.getApplicationContext());
-
-    }
-*/
     private enum IconColorIndicator {
         Good,
         Warning,
@@ -1261,132 +738,6 @@ public class GpsMainActivity extends GenericViewFragment
         Marker aMarker = googleMap.addMarker(markerOptions);
         locationMarkers.add(aMarker);
     }
-    /*public void updateLoc() {
-        //add markers for new locations
-        int newRecords = locationMarkers.size();
-        while(newRecords < myinfoList.size()){
-            MyInfo info = myinfoList.get(newRecords);
-            LatLng driverPosition = new LatLng(info.loc.getLatitude(), info.loc.getLongitude());
-
-            BitmapDescriptor bmp;
-            float spd = info.loc.getSpeed();
-            if(info.loc.hasBearing()) {
-                if (spd < 1.0) {//3.6km/h
-                    bmp = BitmapDescriptorFactory.fromResource(R.drawable.arrowup_red);
-                } else if (spd >= 1 && spd < 6) {//21km/h
-                    bmp = BitmapDescriptorFactory.fromResource(R.drawable.arrowup_orange);
-                } else if (spd >= 6 && spd < 12) {//43km/h
-                    bmp = BitmapDescriptorFactory.fromResource(R.drawable.arrowup_cyan);
-                } else //if(spd>=12 && spd<20)
-                {//72km/h
-                    bmp = BitmapDescriptorFactory.fromResource(R.drawable.arrowup_green);
-                }
-            }else{
-                if (spd < 1.0) {//3.6km/h
-                    bmp = BitmapDescriptorFactory.fromResource(R.drawable.circle_red);
-                } else if (spd >= 1 && spd < 6) {//21km/h
-                    bmp = BitmapDescriptorFactory.fromResource(R.drawable.circle_orange);
-                } else if (spd >= 6 && spd < 12) {//43km/h
-                    bmp = BitmapDescriptorFactory.fromResource(R.drawable.circle_cyan);
-                } else //if(spd>=12 && spd<20)
-                {//72km/h
-                    bmp = BitmapDescriptorFactory.fromResource(R.drawable.circle_grn);
-                }
-            }
-            MarkerOptions markerOptions = new MarkerOptions()
-                    .position(driverPosition)
-                    .icon(bmp)
-                    .title("")
-                    //.snippet(driverInfo[i].phone)
-                    //.anchor(0.5f, 0.5f)
-                    //.draggable(true);
-                    .rotation(Math.round(info.loc.getBearing()))
-                    ;
-            Marker aMarker = googleMap.addMarker(markerOptions);
-            locationMarkers.add(aMarker);
-            newRecords++;
-        }
-
-        //check and remove old info
-
-    }
-
-    static public void addNewLoc(MyInfo info){
-        //add new location info
-        myinfoList.add(info);
-        Log.v("geo_tag","location added");
-    }*/
-
-    /*public void clearMarkers() {
-        myinfoList.clear();
-        if (locationMarkers != null) {
-            for (Marker aMarker : locationMarkers) {
-                aMarker.remove();
-            }
-        }
-        locationMarkers.clear();
-    }
-
-    public void onGetDataClicked(View v) {
-        UploadClass.firstTime = true;
-        UploadClass uc = new UploadClass(GpsMainActivity.this);
-        long i = 0, step = 100;
-        uc.getServerData(i, step, dbhandler);
-    }
-
-    public void onExportClicked(View v) {
-        SQLiteHandler.exportDB(this);
-    }
-
-    public void onImportClicked(View v) {
-        SQLiteHandler.importDB(this);
-    }
-
-    public void onCalculateClicked(View v) {
-        pDialog.setMessage("Calc'ing ...");
-        showDialog();
-        dbhandler.calc();
-        hideDialog();
-    }
-
-    public void onShotClicked(View v) {
-        captureScreen();
-    }
-
-
-    // This method returns black gmaps screen
-    private Uri takeScreenshot() {
-        Date now = new Date();
-        android.text.format.DateFormat.format("yyyy-MM-dd_hh:mm:ss", now);
-
-        try {
-            // image naming and path  to include sd card  appending name you choose for file
-            String mPath = Environment.getExternalStorageDirectory().toString() + "/" + now + ".jpg";
-
-            // create bitmap screen capture
-            View v1 = getWindow().getDecorView().getRootView();
-            v1.setDrawingCacheEnabled(true);
-            Bitmap bitmap = Bitmap.createBitmap(v1.getDrawingCache());
-            v1.setDrawingCacheEnabled(false);
-
-            File imageFile = new File(mPath);
-
-            FileOutputStream outputStream = new FileOutputStream(imageFile);
-            int quality = 100;
-            bitmap.compress(Bitmap.CompressFormat.JPEG, quality, outputStream);
-            outputStream.flush();
-            outputStream.close();
-            Toast.makeText(this, "Stored in: " + mPath, Toast.LENGTH_LONG).show();
-            //openScreenshot(imageFile);
-            return Uri.fromFile(imageFile);
-        } catch (Throwable e) {
-            // Several error may come out with file handling or OOM
-            e.printStackTrace();
-        }
-        return null;
-    }*/
-
-    //private ShareActionProvider mShareActionProvider;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -1399,13 +750,6 @@ public class GpsMainActivity extends GenericViewFragment
         // Return true to display menu
         return true;
     }
-
-    // Call to update the share intent
-    /*private void setShareIntent(Intent shareIntent) {
-        if (mShareActionProvider != null) {
-            mShareActionProvider.setShareIntent(shareIntent);
-        }
-    }*/
 
     public Bitmap drawMultilineTextToBitmap(Context gContext, Bitmap bitmap, String gText) {
         // prepare canvas
@@ -1524,13 +868,6 @@ public class GpsMainActivity extends GenericViewFragment
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_item_share:
-                //Uri imageUri = takeScreenshot();
-                /*Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
-                sharingIntent.setType("text/plain");
-                String shareBodyText = "Check it out. Your message goes here";
-                sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT,"Subject here");
-                sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBodyText);
-                startActivity(Intent.createChooser(sharingIntent, "Sharing Option"));*/
                 captureAndShareGMap();
                 return true;
 

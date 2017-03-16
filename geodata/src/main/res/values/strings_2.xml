@@ -1,105 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="applanguage">en</string>
-    <string name="Drivers">Drivers</string>
-    <string name="Passengers">Passengers</string>
 
-    <string name="pref_profile_title">User Profile</string>
-    <string name="pref_profile_summary">Change user profile</string>
     <string name="pref_language_title">Language</string>
     <string name="pref_language_summary">Set display language</string>
 
-    <string name="driverLabel">Driver:</string>
-    <string name="infoLabel">Info:</string>
-    <string name="btnPickFrom">Pick From...</string>
-    <string name="btn_Accept">Accept</string>
-    <string name="passengerLabel">Passenger:</string>
-
-    <string name="dlgFee">Fee</string>
-    <string name="dlgFeeEx">Ex. 5,000 IQD</string>
-    <string name="dlgNoOfPassengers">No. of Passangers</string>
-    <string name="dlgAdditionalCarry">Additional Carry-on or Notes</string>
-    <string name="dlgAdditionalCarryEx">Ex. 3 medium bags</string>
-
-    <string name="gpsMainBtnReconnect">Re-Connect</string>
-    <string name="gpsMainMsgRequestCanceled">Request Canceled</string>
-    <string name="gpsMainBtnCancel">Cancel:</string>
-    <string name="gpsMainBtnDropto">Drop to...</string>
-    <string name="gpsMainBtnConfirm">Confirm...</string>
-    <string name="gpsMainBtnPickFrom">Pick From...</string>
-    <string name="gpsMainBtnPickedUp">Picked Up</string>
-    <string name="gpsMainBtnDone">Done</string>
-    <string name="gpsMainBtnAccept">Accept</string>
-
-    <string name="gpsMainFeeDlgTitle">Fee and Additional Notes</string>
-    <string name="gpsMainFeeDlgPositive">Confirm</string>
-
-    <string name="gpsMainDlgMsgUpdating">Updating ...</string>
-
-    <!-- login_register/LoginActivity -->
-    <string name="loginMsgNotRegistered">App is not Registered Error</string>
-    <string name="loginMsgEnterCredentials">Please enter the credentials!</string>
-    <string name="loginDlgMsgUpdating">Logging in ...</string>
-    <!-- login_register/RegisterActivity -->
-    <string name="loginMsgEnterDetails">Please enter your details!</string>
-    <string name="loginDlgMsgRegistering">Registering ...</string>
-
-    <!-- helper/UploadClass -->
-    <string name="uploadDlgMsgUpdating">Updating State ...</string>
-    <string name="uploadDlgMsgUpdatingRqst">Updating Request State...</string>
-    <string name="uploadDlgMsgUploadingRqst">Uploading Request ...</string>
-    <string name="uploadDlgMsgUpdatingRqsts">Updating Requests ...</string>
-    <string name="uploadDriverInfo">Info:\n</string>
-    <string name="uploadDlgMsgUpdatingInfo">Updating...</string>
-
-    <!-- gcm_client/MyGcmListenerService -->
-    <string name="gcmClientReqState">Request State:</string>
-    <string name="gcmClientGcmMsg">GeoData Driver</string>
-    <string name="gcmClientNewReq">New requests</string>
+    <string name="gcmClientGcmMsg">GeoData</string>
 
     <string name="appAbout">GeoData Version: </string>
     <string name="str_default">Default</string>
     <string name="notifications_pref_title">Requests Notifications</string>
     <string name="notifications_pref_summary">Set notifications On/Off</string>
 
-    <string name="infoName">Name:</string>
-    <string name="infoTime">Time:</string>
-    <string name="infoNoPassengers">No. of Passengers:</string>
-    <string name="infoFee">Fee:</string>
-    <string name="infoNotes">Notes:</string>
-    <string name="infoFromDesc">From:</string>
-    <string name="infoToDesc">To:</string>
-
-    <string name="profileHintName">ex: abc</string>
-    <string name="profileHintPhone">ex: 0771234567</string>
-    <string name="profilePhoneVerify">Verify...</string>
-    <string name="profileHintEmail">ex: abc@email.com</string>
-
-    <string name="profileHintCarBrand">ex: Nissan</string>
-    <string name="profileHintCarModel">ex.: Sunny</string>
-    <string name="profileHintCarMake">ex.: 2010</string>
-    <string name="profileHintCarColor">ex: White</string>
-    <string name="profileHintCarPlate">ex: 12345</string>
-    <string name="profileHintCarOther">ex: AC &amp; WiFi</string>
-
-    <string name="profilePhoneVerSMS">You will receive SMS with a verification code</string>
-    <string name="profilePhoneVerAlready">Your phone is already verified</string>
-    <string name="profilePhoneVerCodeConfirmed">Phone is verified. Thanks</string>
-    <string name="profilePhoneIsNotVerified">Phone is not verified. Please Verify it to take requests.\nTo verify goto: Settings->General Options->User Profile</string>
-
-    <string name="profilePhoneVerDlgTitle">Phone Verification</string>
-    <string name="profilePhoneVerDlgPhone">Mobile:</string>
-    <string name="profilePhoneVerDlgcode">Code:</string>
-    <string name="profilePhoneVerDlgConfirm">Confirm</string>
-    <string name="profilePhoneVerDlgResend">Request Code</string>
-
-    <string name="loginUpdateApp">Please update your app</string>
-    <string name="loginUpdateAppTitle">UPDATE</string>
-
-    <string name="forgotPasswordReset">Your password reset link was sent to your e-mail address</string>
-    <string name="forgotEnterEmail">Enter your email to send you reset link</string>
-
-    <string name="driverApp">Driver Version</string>
     <string name="BtnTextTurnOn">Turn On Logging</string>
     <string name="BtnTextTurnOff">Turn Off Logging</string>
 

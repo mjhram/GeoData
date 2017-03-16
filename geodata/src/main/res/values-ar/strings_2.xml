@@ -1,104 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="applanguage">ar</string>
-    <string name="Drivers">سيارات التاكسي</string>
-    <string name="Passengers">الركاب</string>
-
-    <string name="pref_profile_title">معلومات  المستخدم</string>
-    <string name="pref_profile_summary">تغيير معلومات المستخدم</string>
 
     <string name="pref_language_title">اللغة</string>
     <string name="pref_language_summary">اختيار لغة العرض</string>
-
-    <string name="driverLabel">السائق:</string>
-    <string name="infoLabel">معلومات:</string>
-    <string name="btnPickFrom">اركب من...</string>
-    <string name="btn_Accept">موافق</string>
-    <string name="passengerLabel">الراكب:</string>
-
-    <string name="dlgFee">الاجرة</string>
-    <string name="dlgFeeEx">مثلا: 5,000 دينار</string>
-    <string name="dlgNoOfPassengers">عدد الركاب</string>
-    <string name="dlgAdditionalCarry">حمولة اوملاحظات اضافية</string>
-    <string name="dlgAdditionalCarryEx">مثلا: 3 حقائب متوسطة الحجم</string>
-
-    <string name="gpsMainBtnReconnect">اعادة ربط</string>
-    <string name="gpsMainMsgRequestCanceled">تم الغاء الطلب</string>
-    <string name="gpsMainBtnCancel">الغاء:</string>
-    <string name="gpsMainBtnDropto">الوصول الى</string>
-    <string name="gpsMainBtnConfirm">تأكيد...</string>
-    <string name="gpsMainBtnPickFrom">اركب من...</string>
-    <string name="gpsMainBtnPickedUp">الراكب صعد</string>
-    <string name="gpsMainBtnDone">تم</string>
-    <string name="gpsMainBtnAccept">موافق</string>
-
-    <string name="gpsMainFeeDlgTitle">الاجرة وملاحظات اخرى</string>
-    <string name="gpsMainFeeDlgPositive">تأكيد</string>
-
-    <string name="gpsMainDlgMsgUpdating">تحديث...</string>
-
-    <!-- login_register/LoginActivity -->
-    <string name="loginMsgNotRegistered">البرنامج غير مسجل</string>
-    <string name="loginMsgEnterCredentials">الرجاء ادخال بيانات الدخول </string>
-    <string name="loginDlgMsgUpdating">الولوج الى البرنامج</string>
-    <!-- login_register/RegisterActivity -->
-    <string name="loginMsgEnterDetails">الرجاء ادخال التفاصيل</string>
-    <string name="loginDlgMsgRegistering">تسجيل...</string>
-
-    <!-- helper/UploadClass -->
-    <string name="uploadDlgMsgUpdating">تحديث الحالة...</string>
-    <string name="uploadDlgMsgUpdatingRqst">تحديث حالة الطلب...</string>
-    <string name="uploadDlgMsgUploadingRqst">رفع الطلب...</string>
-    <string name="uploadDlgMsgUpdatingRqsts">تحديث الطلبات... </string>
-    <string name="uploadDriverInfo">المعلومات:\n</string>
-    <string name="uploadDlgMsgUpdatingInfo">تحديث...</string>
-
-    <!-- gcm_client/MyGcmListenerService -->
-    <string name="gcmClientReqState">حالة الطلب:</string>
-    <string name="gcmClientNewReq">طلبات جديدة</string>
 
     <string name="appAbout">GeoData الاصدار:</string>
     <string name="str_default">افتراضي</string>
     <string name="notifications_pref_title">اشعارات الطلبات</string>
     <string name="notifications_pref_summary">تفعيل/تعطيل الاشعارات</string>
 
-    <string name="infoName">الاسم:</string>
-    <string name="infoTime">الوقت:</string>
-    <string name="infoNoPassengers">عدد الركاب:</string>
-    <string name="infoFee">الاجرة:</string>
-    <string name="infoNotes">ملاحظات:</string>
-    <string name="infoFromDesc">من:</string>
-    <string name="infoToDesc">الى:</string>
+    <string name="BtnTextTurnOn">تشغيل</string>
+    <string name="BtnTextTurnOff">اطفاء</string>
 
-
-    <string name="profileHintName">مثلا: زيد</string>
-    <string name="profileHintPhone">مثلا: 0771234567</string>
-    <string name="profilePhoneVerify">تأكيد...</string>
-    <string name="profileHintEmail">مثلا: abc@email.com</string>
-
-    <string name="profileHintCarBrand">مثلا: نيسان</string>
-    <string name="profileHintCarModel">مثلا: تيدا</string>
-    <string name="profileHintCarMake">مثلا: 2010</string>
-    <string name="profileHintCarColor">مثلا: ابيض</string>
-    <string name="profileHintCarPlate">مثلا: 12345</string>
-    <string name="profileHintCarOther">مثلا: تبريد وWiFi</string>
-
-    <string name="profilePhoneVerSMS">سوف تستلم رمز التأكيد من خلال رسالة قصيرة</string>
-    <string name="profilePhoneVerAlready">رقم الهاتف مؤكد مسبقا</string>
-    <string name="profilePhoneVerCodeConfirmed">تم تأكيد رقم الموبايل</string>
-    <string name="profilePhoneIsNotVerified">الموبايل غير مؤكد. الرجاء تأكيد رقم الموبايل قبل اخذ الطلبات.\nتأكيد الموبايل من: خيارات عامة-معلومات المستخدم ثم اضغط تأكيد</string>
-
-    <string name="profilePhoneVerDlgTitle">تأكيد الموبايل</string>
-    <string name="profilePhoneVerDlgPhone">موبايل:</string>
-    <string name="profilePhoneVerDlgcode">الرمز:</string>
-    <string name="profilePhoneVerDlgConfirm">تأكيد</string>
-    <string name="profilePhoneVerDlgResend">طلب الرمز</string>
-
-    <string name="loginUpdateApp">يرجى تحديث التطبيق</string>
-    <string name="loginUpdateAppTitle">تحديث</string>
-
-    <string name="forgotPasswordReset">تم ارسال رابط تغيير كلمة المرور الى بريدك الالكتروني</string>
-    <string name="forgotEnterEmail">ادخل بريدك الالكتروني لارسال رابط تغيير كلمة المرور</string>
-
-    <string name="driverApp">نسخة السائق</string>
 </resources>
