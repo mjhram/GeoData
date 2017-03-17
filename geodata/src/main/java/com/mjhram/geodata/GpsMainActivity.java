@@ -23,6 +23,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -36,6 +37,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -52,7 +54,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -123,7 +124,8 @@ public class GpsMainActivity extends GenericViewFragment
     private GoogleApiClient mGoogleApiClient;
     //public Marker fromMarker, toMarker;
     //private Button btnAccept;
-    private Button btnAcceptedTask;
+    //private Button btnAcceptedTask;
+    private FloatingActionButton btnOnOff;
 
     private int driverState;
     //private CountDownTimer countDownTimer;
@@ -138,13 +140,14 @@ public class GpsMainActivity extends GenericViewFragment
             switch (driverState) {
                 case 0://state0 is serviceON, then turn it off
                     EventBus.getDefault().postSticky(new CommandEvents.RequestStartStop(false));
-                    btnAcceptedTask.setText(getString(R.string.BtnTextTurnOn));
-
+                    //btnAcceptedTask.setText(getString(R.string.BtnTextTurnOn));
+                    btnOnOff.setBackgroundTintList(ColorStateList.valueOf(0xffcc334a));
                     driverState = 1;
                     break;
                 case 1://state1 is serviceOFF, then turn it on
                     EventBus.getDefault().postSticky(new CommandEvents.RequestStartStop(true));
-                    btnAcceptedTask.setText(getString(R.string.BtnTextTurnOff));
+                    //btnAcceptedTask.setText(getString(R.string.BtnTextTurnOff));
+                    btnOnOff.setBackgroundTintList(ColorStateList.valueOf(0xff4caf50));
                     driverState = 0;
                     firstMarkerTime=-1;
                     lastMarkerTime=-1;
@@ -179,9 +182,10 @@ public class GpsMainActivity extends GenericViewFragment
         //AppSettings.setTripId("-1");// new tripid
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 
-        btnAcceptedTask = (Button) findViewById(R.id.btnAcceptedTask);
-
-        btnAcceptedTask.setOnClickListener(new btnOnClickListener());
+        btnOnOff = (FloatingActionButton) findViewById(R.id.fab_onoff);
+        btnOnOff.setOnClickListener(new btnOnClickListener());
+        /*btnAcceptedTask = (Button) findViewById(R.id.btnAcceptedTask);
+        btnAcceptedTask.setOnClickListener(new btnOnClickListener());*/
 
 
         buildGoogleApiClient();
@@ -217,8 +221,13 @@ public class GpsMainActivity extends GenericViewFragment
         map.setMyLocationEnabled(true);
         //map.setOnMyLocationButtonClickListener(this);
         googleMap = map;
+        new Handler().post(new Runnable() {
+            @Override
+            public void run() {
+                googleMap.setPadding(0,0,0,btnOnOff.getHeight());
+            }
+        });
         //setUpMap(googleMap);
-
     }
 
     @Override
@@ -730,6 +739,7 @@ public class GpsMainActivity extends GenericViewFragment
                 .position(driverPosition)
                 .icon(bmp)
                 .title("")
+                .flat(true)
                 //.snippet(driverInfo[i].phone)
                 //.anchor(0.5f, 0.5f)
                 //.draggable(true);

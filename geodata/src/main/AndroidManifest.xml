@@ -16,7 +16,6 @@
     <uses-permission
         android:name="android.permission.ACCESS_MOCK_LOCATION"
         tools:ignore="MockLocation" />
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <!-- Creating Permission to receive Google Maps -->
     <permission
         android:name="com.mjhram.geodata.permission.MAPS_RECEIVE"

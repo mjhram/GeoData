@@ -9,7 +9,7 @@
 
     <string name="appAbout">GeoData Version: </string>
     <string name="str_default">Default</string>
-    <string name="notifications_pref_title">Requests Notifications</string>
+    <string name="notifications_pref_title">Notifications</string>
     <string name="notifications_pref_summary">Set notifications On/Off</string>
 
     <string name="BtnTextTurnOn">Turn On Logging</string>
