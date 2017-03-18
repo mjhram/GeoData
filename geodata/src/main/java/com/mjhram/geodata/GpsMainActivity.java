@@ -306,6 +306,8 @@ public class GpsMainActivity extends GenericViewFragment
 
     @Override
     public void onDestroy() {
+        File folder = new File(Environment.getExternalStorageDirectory() + "/geodatatmp");
+        deleteRecursive(folder);
         activitiesLaunched.getAndDecrement();
         StopAndUnbindServiceIfRequired();
         //UnregisterEventBus();
@@ -834,10 +836,18 @@ public class GpsMainActivity extends GenericViewFragment
                 Bitmap snapshot = drawMultilineTextToBitmap(GpsMainActivity.this, snapshot1, dateString);
                 //bitmap = snapshot;
                 String filePath = System.currentTimeMillis() + ".jpeg";
-                filePath = Environment.getExternalStorageDirectory().toString() + "/" + filePath;
+                File folder = new File(Environment.getExternalStorageDirectory() + "/geodatatmp");
+                boolean success = true;
+                if (!folder.exists()) {
+                    success = folder.mkdir();
+                }
+                if(!success) {
+                    return;
+                }
+                //filePath = Environment.getExternalStorageDirectory().toString() + "/" + filePath;
                 try
                 {
-                    File imageFile = new File(filePath);
+                    File imageFile = new File(folder, filePath);
 
                     FileOutputStream fout = new FileOutputStream(imageFile);
                     // Write the string to the file
@@ -850,6 +860,7 @@ public class GpsMainActivity extends GenericViewFragment
                     shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(imageFile));
                     shareIntent.setType("image/jpeg");
                     startActivity(Intent.createChooser(shareIntent, "Sahre..."));
+
 
                 }
                 catch (FileNotFoundException e)
@@ -872,6 +883,15 @@ public class GpsMainActivity extends GenericViewFragment
         };
 
         googleMap.snapshot(callback);
+    }
+
+    private static void deleteRecursive(File fileOrDirectory) {
+        if (fileOrDirectory.isDirectory())
+            for (File child : fileOrDirectory.listFiles()) {
+                deleteRecursive(child);
+            }
+
+        fileOrDirectory.delete();
     }
 
     @Override

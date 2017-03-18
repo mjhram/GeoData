@@ -104,10 +104,10 @@ android {
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion 19
-        versionName '1.0.2'
+        versionName '1.0.3'
         applicationId 'com.mjhram.geodata'
         signingConfig signingConfigs.config
-        versionCode 102
+        versionCode 103
 
         vectorDrawables.useSupportLibrary = true
     }
@@ -193,21 +193,21 @@ dependencies {
     // compile 'com.google.android.gms:play-services-drive:7.5.0'
     //compile 'commons-net:commons-net:2.0' //for 'ftp' upload
     /*compile('org.apache.httpcomponents:httpmime:4.0.3') {
-                                                                                                                    exclude module: 'commons-logging'
-                                                                                                                    exclude module: 'httpcore'
-                                                                                                                    exclude module: 'httpclient'
-                                                                                                                }
-                                                                                                                compile('org.apache.james:apache-mime4j:0.6.1') {
-                                                                                                                    exclude module: 'commons-logging'
-                                                                                                                }*/
+                                                                                                                        exclude module: 'commons-logging'
+                                                                                                                        exclude module: 'httpcore'
+                                                                                                                        exclude module: 'httpclient'
+                                                                                                                    }
+                                                                                                                    compile('org.apache.james:apache-mime4j:0.6.1') {
+                                                                                                                        exclude module: 'commons-logging'
+                                                                                                                    }*/
     /*compile('oauth.signpost:signpost-commonshttp4:1.2.1.1') {
-                                                                                                                    exclude module: 'commons-logging'
-                                                                                                                    exclude module: 'httpcore'
-                                                                                                                    exclude module: 'httpclient'
-                                                                                                                }
-                                                                                                                compile('oauth.signpost:signpost-core:1.2.1.1') {
-                                                                                                                    exclude module: 'commons-codec'
-                                                                                                                }*/
+                                                                                                                        exclude module: 'commons-logging'
+                                                                                                                        exclude module: 'httpcore'
+                                                                                                                        exclude module: 'httpclient'
+                                                                                                                    }
+                                                                                                                    compile('oauth.signpost:signpost-core:1.2.1.1') {
+                                                                                                                        exclude module: 'commons-codec'
+                                                                                                                    }*/
     //compile 'com.googlecode.json-simple:json-simple:1.1'
     //Logging
     compile 'org.slf4j:slf4j-api:1.7.6'
